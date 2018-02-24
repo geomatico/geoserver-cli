@@ -7,7 +7,7 @@ class GeoServerAPITestCase(unittest.TestCase):
 
     def test_api_method(self):
         """ Testing method """
-        self.assertEqual(api.test(5), 10)
+        self.assertEqual(api.test(), 200)
 
 
 if __name__ == '__main__':
