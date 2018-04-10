@@ -3,6 +3,6 @@ __pycache__
 env
 .coverage
 htmlcov
-docs/source/api
+docs/source/html_extra
 docs/build
 
