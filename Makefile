@@ -14,3 +14,6 @@ coverage-html: test
 	@echo -n Creating coverage report...
 	@coverage html --omit="*__init__.py","test/*"
 	@echo Done!	
+
+doc:
+	@cd docs && make html

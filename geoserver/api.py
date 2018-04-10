@@ -1,9 +1,14 @@
 import requests
 
+"""
+GeoServer API module
+"""
 
-def test():
-    try:
-        return requests.get("http://localhost:8080/geoserver/").status_code
-    except Exception:
-        return -1
-
+class Test:
+  def test(a):
+    """
+    This is a test method
+    @param a number
+    @returns another number
+    """
+    return a * 2

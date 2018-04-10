@@ -1,0 +1,9 @@
+/*! \mainpage Title
+ *
+ * ### Markdown subtitle
+ *
+ * This is *markdown* `code`.
+ *
+ * Go back to the [doc](../index.html).
+ *  
+ */
