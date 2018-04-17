@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+# # -*- coding: utf-8 -*-
+
+import sys
+from geoserver.cli.parser import parser, actions
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    if not args.cmd:
+        parser.print_help()
+    else:
+        try:
+            actions[args.cmd].run(args)
+        except Exception as e:
+            print(e, file=sys.stderr)
