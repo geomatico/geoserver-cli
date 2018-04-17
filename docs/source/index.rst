@@ -6,4 +6,4 @@ GeoServer CLI
 
 
 * `API <api/index.html>`_
-
+* :doc:`cli`
