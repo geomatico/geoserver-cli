@@ -2,12 +2,12 @@
 # # -*- coding: utf-8 -*-
 
 import argparse
-from geoserver.cli import imports, workspace, layer, layergroup, style, reload, reset, fonts
+from geoserver.cli import imports, workspace, datastore, layer, layergroup, style, reload, reset, fonts
 
 actions = {
     'import': imports,
     'ws': workspace,
-    # 'ds': datastore,
+    'ds': datastore,
     'layer': layer,
     'layergroup': layergroup,
     'style': style,

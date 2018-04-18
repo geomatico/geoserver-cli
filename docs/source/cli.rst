@@ -12,6 +12,15 @@ workspaces
   :prog: geoserver
   :path: ws
 
+datastores
+----------
+
+.. argparse::
+  :module: geoserver.cli.parser
+  :func: parser
+  :prog: geoserver
+  :path: ds
+
 layer
 -----
 
