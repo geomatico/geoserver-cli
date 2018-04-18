@@ -2,7 +2,7 @@
 # # -*- coding: utf-8 -*-
 
 import argparse
-from geoserver.cli import imports, workspace, layer, reload
+from geoserver.cli import imports, workspace, layer, reload, reset
 
 actions = {
     'import': imports,
@@ -11,8 +11,8 @@ actions = {
     'layer': layer,
     # 'layergroup': layergroup,
     # 'style': style,
-    'reload': reload
-    # 'reset': reset,
+    'reload': reload,
+    'reset': reset,
     # 'fonts': fonts
 }
 
@@ -20,6 +20,6 @@ parser = argparse.ArgumentParser(description='GeoServer CLI')
 
 subparsers = parser.add_subparsers(title='Commands', dest='cmd')
 
-for key in actions:
+for key in sorted(actions.keys()):
     subparser = subparsers.add_parser(key, help=actions[key].HELP)
     actions[key].configure_parser(subparser)

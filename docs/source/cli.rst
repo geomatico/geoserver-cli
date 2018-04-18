@@ -38,3 +38,13 @@ reload
   :func: parser
   :prog: geoserver
   :path: reload
+
+
+reset
+------
+
+.. argparse::
+  :module: geoserver.cli.parser
+  :func: parser
+  :prog: geoserver
+  :path: reset
