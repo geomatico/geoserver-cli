@@ -29,3 +29,12 @@ import
   :func: parser
   :prog: geoserver
   :path: import
+
+reload
+------
+
+.. argparse::
+  :module: geoserver.cli.parser
+  :func: parser
+  :prog: geoserver
+  :path: reload
