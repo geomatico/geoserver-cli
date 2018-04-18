@@ -2,7 +2,7 @@
 # # -*- coding: utf-8 -*-
 
 import argparse
-from geoserver.cli import imports, workspace, layer, reload, reset, fonts
+from geoserver.cli import imports, workspace, layer, style, reload, reset, fonts
 
 actions = {
     'import': imports,
@@ -10,7 +10,7 @@ actions = {
     # 'ds': datastore,
     'layer': layer,
     # 'layergroup': layergroup,
-    # 'style': style,
+    'style': style,
     'reload': reload,
     'reset': reset,
     'fonts': fonts

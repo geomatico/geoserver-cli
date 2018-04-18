@@ -21,6 +21,15 @@ layer
   :prog: geoserver
   :path: layer
 
+style
+-----
+
+.. argparse::
+  :module: geoserver.cli.parser
+  :func: parser
+  :prog: geoserver
+  :path: style
+
 import
 ------
 
