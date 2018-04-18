@@ -2,7 +2,7 @@
 # # -*- coding: utf-8 -*-
 
 import argparse
-from geoserver.cli import imports, workspace, layer, reload, reset
+from geoserver.cli import imports, workspace, layer, reload, reset, fonts
 
 actions = {
     'import': imports,
@@ -13,7 +13,7 @@ actions = {
     # 'style': style,
     'reload': reload,
     'reset': reset,
-    # 'fonts': fonts
+    'fonts': fonts
 }
 
 parser = argparse.ArgumentParser(description='GeoServer CLI')

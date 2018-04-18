@@ -30,6 +30,16 @@ import
   :prog: geoserver
   :path: import
 
+
+fonts
+------
+
+.. argparse::
+  :module: geoserver.cli.parser
+  :func: parser
+  :prog: geoserver
+  :path: fonts
+
 reload
 ------
 
