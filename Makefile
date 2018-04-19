@@ -13,7 +13,8 @@ coverage-html: test
 	@echo ============================= COVERAGE ==============================
 	@echo -n Creating coverage report...
 	@coverage html --omit="*__init__.py","test/*"
-	@echo Done!	
+	@echo Done!
 
 doc:
-	@cd docs && make html
+	@sphinx-apidoc -feo docs/source geoserver geoserver/cli
+	@cd docs && make clean html

@@ -3,6 +3,8 @@ __pycache__
 env
 .coverage
 htmlcov
-docs/source/html_extra
+docs/source/geoserver.*.rst
+docs/source/geoserver.rst
+docs/source/modules.rst
 docs/build
-
+*.egg-info
