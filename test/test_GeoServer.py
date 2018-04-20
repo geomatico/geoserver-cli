@@ -84,7 +84,8 @@ class GeoServerTestCase(unittest.TestCase):
         pass
 
     def test_reset(self):
-        pass
+        # Just make sure it doesn't break
+        self.gs.reset()
 
     def test_reload(self):
         pass

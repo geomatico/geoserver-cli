@@ -66,7 +66,7 @@ class GeoServer:
         pass
 
     def reset(self):
-        pass
+        self._post('reset')
 
     def reload(self):
         pass
@@ -81,12 +81,20 @@ class GeoServer:
         pass
 
     def _get(self, path):
-        url = urljoin(self.url, path, ".json")
-        r = requests.get(url, auth=(self.user, self.password))
-        if r.status_code != 200:
-            raise IOError("Cannot obtain {}. Response code is {}"
-                          .format(url, r.status_code))
-        return r.json()
+        return self._request_json(path)
 
-    def _get_json_array(self, name):
-        return self._get(name)[name][name[:-1]]
+    def _post(self, path, data=None):
+        return self._request_json(path, method='POST')
+
+    def _request_json(self, path,
+                      method='get',
+                      expected_code=200,
+                      data=None):
+        url = urljoin(self.url, path, ".json")
+        f = getattr(requests, method.lower())
+        r = f(url, auth=(self.user, self.password), data=data)
+        if r.status_code != expected_code:
+            msg = ("Cannot perform {} request to {}. Response code is {}"
+                   .format(method, url, r.status_code))
+            raise IOError(msg)
+        return r.json() if r.text else None
