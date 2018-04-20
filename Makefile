@@ -6,13 +6,14 @@ test:
 .PHONY: coverage
 coverage: test
 	@echo ============================= COVERAGE ==============================
-	@coverage report --omit="*__init__.py","test/*"
+	@coverage report --omit="*__init__.py","test/*","env/*"
 
 .PHONY: coverage-html
 coverage-html: test
 	@echo ============================= COVERAGE ==============================
 	@echo -n Creating coverage report...
-	@coverage html --omit="*__init__.py","test/*"
+	@rm -rf htmlcov
+	@coverage html --omit="*__init__.py","test/*","env/*"
 	@echo Done!
 
 .PHONY: doc
