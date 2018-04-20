@@ -22,4 +22,4 @@ doc:
 
 .PHONY: docker-run
 docker-run:
-	docker run -d -p 8080:8080 -v $PWD/test/geoserver_data_dir:/var/local/geoserver --name=geoserver-cli-test oscarfonts/geoserver:latest
+	docker run -d -p 8080:8080 -v ${PWD}/test/geoserver_data_dir:/var/local/geoserver --name=geoserver-cli-test oscarfonts/geoserver:latest
