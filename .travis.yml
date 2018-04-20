@@ -7,7 +7,7 @@ python:
 sudo: required
 env:
 - GEOSERVER_VERSION=latest
-- GEOSERVER_VERSION=maintenance
+- GEOSERVER_VERSION=2.12.2
 services:
 - docker
 before_install:

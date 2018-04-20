@@ -5,7 +5,7 @@ GeoServer API module
 """
 
 class Test:
-  def test(a):
+  def test(self, a):
     """
     This is a test method
     @param a number
