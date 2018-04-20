@@ -15,7 +15,7 @@ class GeoServer:
         self.user = user
         self.password = password
 
-    def _create_workspace(self, ws, namespaces=None):
+    def _workspace_from_json(self, ws, namespaces=None):
         if not namespaces:
             namespaces = self._get('namespaces')['namespaces']['namespace']
 
@@ -29,7 +29,7 @@ class GeoServer:
     def get_workspaces(self):
         workspaces = self._get('workspaces')['workspaces']['workspace']
         namespaces = self._get('namespaces')['namespaces']['namespace']
-        return list(map(lambda x: self._create_workspace(x, namespaces),
+        return list(map(lambda x: self._workspace_from_json(x, namespaces),
                         workspaces))
 
     def get_workspace(self, name):
@@ -40,7 +40,7 @@ class GeoServer:
             return None
 
         workspace = json['workspace']
-        return self._create_workspace(json['workspace'])
+        return self._workspace_from_json(json['workspace'])
 
     def get_datastores(self, workspace=None):
         pass
