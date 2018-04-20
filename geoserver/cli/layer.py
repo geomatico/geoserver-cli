@@ -31,7 +31,7 @@ def configure_parser(parser):
                         help='Name of the datastore containing the layer',
                         required=True)
     create.add_argument('-s', '--style',
-                        help='Name of the style to use for the layer',
+                        help='Name of the default style to use for the layer',
                         required=False)
     create.add_argument('name', help='Name of the layer to create')
 
@@ -40,7 +40,7 @@ def configure_parser(parser):
                                    description='Updates a layer')
     update.add_argument('name', help='Name of the layer')
     update.add_argument('-s', '--style',
-                        help='Name of the style to use for the layer',
+                        help='Name of the default style to use for the layer',
                         required=False)
 
     # Delete

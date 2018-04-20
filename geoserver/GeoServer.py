@@ -5,6 +5,7 @@ import requests
 import logging
 from urllib.parse import urljoin
 from geoserver.Workspace import Workspace
+from geoserver.Layer import Layer
 from geoserver.Style import Style
 
 
@@ -42,14 +43,26 @@ class GeoServer:
         workspace = json['workspace']
         return self._workspace_from_json(json['workspace'])
 
-    def get_datastores(self, workspace=None):
+    def get_datastores(self, workspace):
         pass
 
     def get_datastore(self, name, workspace=None):
         pass
 
     def get_layers(self):
-        pass
+        layers = self._get('layers')['layers']['layer']
+        ret = []
+        for layer in layers:
+            layer_info = self._get('layers/' + layer['name'])['layer']
+            style = self.get_style(layer_info['defaultStyle']['name'])
+
+            res = self._get(layer_info['resource']['href'])
+            res_info = next(iter(res.values()))
+            ws = self.get_workspace(res_info['namespace']['name'])
+            ds = self.get_datastore(res_info['store']['name'])
+
+            ret.append(Layer(layer['name'], self, style, ds, ws))
+        return ret
 
     def get_layer(self, name):
         pass

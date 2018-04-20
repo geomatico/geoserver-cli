@@ -40,7 +40,18 @@ class GeoServerTestCase(unittest.TestCase):
         pass
 
     def test_get_layers(self):
-        pass
+        layers = self.gs.get_layers()
+        names = set(map(lambda layer: layer.get_name(), layers))
+        expected = set(['sf:sfdem', 'nurc:Img_Sample', 'tiger:tiger_roads',
+                        'sf:restricted', 'topp:tasmania_cities',
+                        'tiger:giant_polygon',
+                        'topp:tasmania_state_boundaries',
+                        'sf:archsites', 'tiger:poi', 'nurc:Arc_Sample',
+                        'topp:states', 'tiger:poly_landmarks',
+                        'topp:tasmania_water_bodies', 'sf:bugsites',
+                        'nurc:Pk50095', 'topp:tasmania_roads', 'sf:roads',
+                        'nurc:mosaic', 'sf:streams'])
+        self.assertEqual(names, expected)
 
     def test_get_layer_existing(self):
         pass
