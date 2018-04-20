@@ -90,7 +90,10 @@ class GeoServerTestCase(unittest.TestCase):
         pass
 
     def test_fonts(self):
-        pass
+        fonts = self.gs.fonts()
+        self.assertTrue('Arial' in fonts)
+        self.assertTrue('Times New Roman' in fonts)
+        self.assertTrue('Verdana' in fonts)
 
 
 if __name__ == '__main__':

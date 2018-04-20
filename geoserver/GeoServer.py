@@ -72,7 +72,7 @@ class GeoServer:
         pass
 
     def fonts(self):
-        pass
+        return self._get('fonts')['fonts']
 
     def create_workspace(self, name, namespace):
         pass
