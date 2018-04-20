@@ -5,5 +5,13 @@ GeoServer CLI
    :maxdepth: 2
 
 
-* `API <api/index.html>`_
+* :doc:`geoserver.GeoServer`
+* :doc:`geoserver.Workspace`
+* :doc:`geoserver.Datastore`
+* :doc:`geoserver.Layer`
+* :doc:`geoserver.LayerGroup`
+* :doc:`geoserver.Style`
+* :doc:`geoserver`
+* :doc:`modules`
 * :doc:`cli`
+

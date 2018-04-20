@@ -89,7 +89,7 @@ html_theme = 'nature'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_extra_path = ['html_extra']
+# html_extra_path = ['html_extra']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -160,6 +160,3 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
-
-import subprocess
-subprocess.call('cd ..; doxygen doxygen.config', shell=True)
