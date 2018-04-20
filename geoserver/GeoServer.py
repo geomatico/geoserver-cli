@@ -5,6 +5,7 @@ import requests
 import logging
 from urllib.parse import urljoin
 from geoserver.Workspace import Workspace
+from geoserver.Style import Style
 
 
 class GeoServer:
@@ -60,7 +61,8 @@ class GeoServer:
         pass
 
     def get_styles(self):
-        pass
+        styles = self._get('styles')['styles']['style']
+        return list(map(lambda s: Style(s['name'], self), styles))
 
     def get_style(self, name):
         pass

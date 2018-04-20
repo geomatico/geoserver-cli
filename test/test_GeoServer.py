@@ -56,8 +56,15 @@ class GeoServerTestCase(unittest.TestCase):
     def test_get_layergroup_non_existing(self):
         pass
 
-    def test_get_style(self):
-        pass
+    def test_get_styles(self):
+        styles = self.gs.get_styles()
+        names = set(map(lambda style: style.get_name(), styles))
+        expected = set(['burg', 'capitals', 'cite_lakes', 'dem', 'generic',
+                        'giant_polygon', 'grass', 'green', 'line', 'poi',
+                        'point', 'poly_landmarks', 'polygon', 'pophatch',
+                        'population', 'rain', 'raster', 'restricted',
+                        'simple_roads', 'simple_streams', 'tiger_roads'])
+        self.assertEqual(names, expected)
 
     def test_get_style_existing(self):
         pass
