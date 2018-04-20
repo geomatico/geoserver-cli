@@ -69,7 +69,7 @@ class GeoServer:
         self._post('reset')
 
     def reload(self):
-        pass
+        self._post('reload')
 
     def fonts(self):
         return self._get('fonts')['fonts']
