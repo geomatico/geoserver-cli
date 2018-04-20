@@ -24,6 +24,12 @@ class Datastore(Resource):
     def get_layergroup(self, name):
         pass
 
+    def set_database_params(self, params):
+        pass
+
+    def set_file(self, file):
+        pass
+
     def create_layer(self, name):
         pass
 
