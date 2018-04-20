@@ -1,5 +1,6 @@
 import unittest
 from geoserver.Workspace import Workspace
+from test.utils import *
 
 
 class WorkspaceTestCase(unittest.TestCase):
