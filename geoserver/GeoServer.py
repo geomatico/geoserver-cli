@@ -65,7 +65,12 @@ class GeoServer:
         return list(map(lambda s: Style(s['name'], self), styles))
 
     def get_style(self, name):
-        pass
+        try:
+            style = self._get('styles/' + name)['style']
+            return Style(style['name'], self)
+        except IOError as e:
+            logging.info(e)
+            return None
 
     def reset(self):
         self._post('reset')
@@ -92,7 +97,9 @@ class GeoServer:
                       method='get',
                       expected_code=200,
                       data=None):
-        url = urljoin(self.url, path, ".json")
+        url = urljoin(self.url, path)
+        if not url.endswith(".json"):
+            url = url + ".json"
         f = getattr(requests, method.lower())
         r = f(url, auth=(self.user, self.password), data=data)
         if r.status_code != expected_code:

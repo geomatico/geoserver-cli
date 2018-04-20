@@ -2,6 +2,7 @@ import unittest
 import requests
 from geoserver.GeoServer import GeoServer
 from geoserver.Workspace import Workspace
+from geoserver.Style import Style
 from test.utils import *
 
 
@@ -67,10 +68,12 @@ class GeoServerTestCase(unittest.TestCase):
         self.assertEqual(names, expected)
 
     def test_get_style_existing(self):
-        pass
+        style = self.gs.get_style('burg')
+        self.assertEqual(type(style), Style)
+        self.assertEqual('burg', style.get_name())
 
     def test_get_style_non_existing(self):
-        pass
+        self.assertTrue(self.gs.get_style('invalid') is None)
 
     def test_create_workspace(self):
         pass
