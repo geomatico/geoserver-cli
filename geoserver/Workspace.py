@@ -4,7 +4,7 @@ from geoserver.Resource import Resource
 class Workspace(Resource):
     def __init__(self, name, geoserver, namespace):
         Resource.__init__(self, name, geoserver)
-        pass
+        self.namespace = namespace
 
     def delete(self):
         pass
@@ -16,7 +16,7 @@ class Workspace(Resource):
         pass
 
     def get_namespace(self):
-        pass
+        return self.namespace
 
     def set_namespace(self):
         pass
