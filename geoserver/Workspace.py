@@ -7,7 +7,7 @@ class Workspace(Resource):
         self.namespace = namespace
 
     def delete(self):
-        pass
+        self.geoserver._request('workspaces/' + self.name, method='DELETE')
 
     def get_datastores(self):
         pass

@@ -130,7 +130,28 @@ class GeoServer:
         return self._get('fonts')['fonts']
 
     def create_workspace(self, name, namespace):
-        pass
+        if not name:
+            raise ValueError('Invalid name')
+        if not namespace:
+            raise ValueError('Invalid namespace')
+
+        ws = json.dumps({
+            'workspace': {
+                'name': name
+            }
+        })
+        ns = json.dumps({
+            'namespace': {
+                'prefix': name,
+                'uri': namespace
+            }
+        })
+        self._request(
+            'workspaces', method='POST', expected_code=201,
+            headers={'Content-type': 'application/json'}, data=ws)
+        self._request(
+            'namespaces/' + name, method='PUT',
+            headers={'Content-type': 'application/json'}, data=ns)
 
     def create_style(self, name, sld):
         if not name:

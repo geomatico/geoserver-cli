@@ -119,19 +119,36 @@ class GeoServerTestCase(unittest.TestCase):
         self.assertTrue(self.gs.get_style('invalid') is None)
 
     def test_create_workspace(self):
-        pass
+        self.gs.create_workspace('mynew_workspace', 'http://geomati.co')
+        ws = self.gs.get_workspace('mynew_workspace')
+        self.assertEqual('mynew_workspace', ws.get_name())
+        self.assertEqual('http://geomati.co', ws.get_namespace())
+        self.assertEqual(self.gs, ws.get_geoserver())
+
+        ws.delete()
 
     def test_create_workspace_invalid_name(self):
-        pass
+        try:
+            self.gs.create_workspace(None, 'http://geomati.co')
+            assert False
+        except ValueError:
+            pass
 
     def test_create_workspace_invalid_namespace(self):
-        pass
+        try:
+            self.gs.create_workspace('mynew_workspace', None)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_style(self):
         with open('test/sample.sld') as f:
             sld = f.read()
         self.gs.create_style('new_style', sld)
-        self.gs.get_style('new_style').delete()
+        style = self.gs.get_style('new_style')
+        self.assertEqual('new_style', style.get_name())
+
+        style.delete()
 
     def test_create_style_invalid_name(self):
         with open('test/sample.sld') as f:
