@@ -198,7 +198,7 @@ class GeoServer:
         if format == '.json':
             try:
                 return r.json() if r.text else None
-            except json.JSONDecodeError:
+            except Exception:
                 return r.text
         else:
             return r.text
