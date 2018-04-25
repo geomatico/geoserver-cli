@@ -3,6 +3,7 @@ GeoServer
 """
 import requests
 import logging
+import json
 from urllib.parse import urljoin
 from geoserver.Workspace import Workspace
 from geoserver.Layer import Layer
@@ -120,10 +121,10 @@ class GeoServer:
             return None
 
     def reset(self):
-        self._post('reset')
+        self._request('reset', method='POST')
 
     def reload(self):
-        self._post('reload')
+        self._request('reload', method='POST')
 
     def fonts(self):
         return self._get('fonts')['fonts']
@@ -132,25 +133,51 @@ class GeoServer:
         pass
 
     def create_style(self, name, sld):
-        pass
+        if not name:
+            raise ValueError('Invalid name')
+
+        data = json.dumps({
+            'style': {
+                'name': name,
+                'filename': name + '.sld'
+            }
+        })
+        try:
+            self._request(
+                'styles', method='POST', expected_code=201,
+                headers={'Content-type': 'application/json'}, data=data)
+            self._request(
+                'styles/' + name, method='PUT', format='', data=sld,
+                headers={'Content-type': 'application/vnd.ogc.sld+xml'})
+        except OSError as e:
+            try:
+                self._request('styles/' + name, method='DELETE')
+            except OSError as e:
+                logging.error(e)
+            raise IOError('Cannot add style', e)
 
     def _get(self, path):
-        return self._request_json(path)
+        return self._request(path)
 
-    def _post(self, path, data=None):
-        return self._request_json(path, method='POST')
-
-    def _request_json(self, path,
-                      method='get',
-                      expected_code=200,
-                      data=None):
+    def _request(self, path,
+                 format='.json',
+                 method='get',
+                 expected_code=200,
+                 headers={},
+                 data=None):
         url = urljoin(self.url, path)
-        if not url.endswith(".json"):
-            url = url + ".json"
+        if format and not url.endswith(format):
+            url = url + format
         f = getattr(requests, method.lower())
-        r = f(url, auth=(self.user, self.password), data=data)
+        r = f(url, auth=(self.user, self.password), data=data, headers=headers)
         if r.status_code != expected_code:
             msg = ("Cannot perform {} request to {}. Response code is {}"
                    .format(method, url, r.status_code))
             raise IOError(msg)
-        return r.json() if r.text else None
+        if format == '.json':
+            try:
+                return r.json() if r.text else None
+            except json.JSONDecodeError:
+                return r.text
+        else:
+            return r.text

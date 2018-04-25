@@ -6,7 +6,7 @@ class Style(Resource):
         Resource.__init__(self, name, geoserver)
 
     def delete(self):
-        pass
+        self.geoserver._request('styles/' + self.name, method='DELETE')
 
     def set_sld(self, sld):
         pass

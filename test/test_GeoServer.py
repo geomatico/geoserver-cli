@@ -128,13 +128,37 @@ class GeoServerTestCase(unittest.TestCase):
         pass
 
     def test_create_style(self):
-        pass
+        with open('test/sample.sld') as f:
+            sld = f.read()
+        self.gs.create_style('new_style', sld)
+        self.gs.get_style('new_style').delete()
 
     def test_create_style_invalid_name(self):
-        pass
+        with open('test/sample.sld') as f:
+            sld = f.read()
+        try:
+            self.gs.create_style('', sld)
+            assert False
+        except ValueError:
+            pass
+
+    def test_create_style_None_name(self):
+        with open('test/sample.sld') as f:
+            sld = f.read()
+        try:
+            self.gs.create_style(None, sld)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_style_invalid_sld(self):
-        pass
+        with open('test/invalid.sld') as f:
+            sld = f.read()
+        try:
+            self.gs.create_style('new_style', sld)
+            assert False
+        except IOError:
+            pass
 
     def test_reset(self):
         # Just make sure it doesn't break
