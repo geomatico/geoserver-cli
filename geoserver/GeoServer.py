@@ -53,7 +53,8 @@ class GeoServer:
         layers = self._get('layers')['layers']['layer']
         ret = []
         for layer in layers:
-            layer_info = self._get('layers/' + layer['name'])['layer']
+            name = layer['name']
+            layer_info = self._get('layers/' + name)['layer']
             style = self.get_style(layer_info['defaultStyle']['name'])
 
             res = self._get(layer_info['resource']['href'])
@@ -61,7 +62,8 @@ class GeoServer:
             ws = self.get_workspace(res_info['namespace']['name'])
             ds = self.get_datastore(res_info['store']['name'])
 
-            ret.append(Layer(layer['name'], self, style, ds, ws))
+            qualifiedName = name if ':' in name else ws.get_name() + ':' + name
+            ret.append(Layer(qualifiedName, self, style, ds, ws))
         return ret
 
     def get_layer(self, name):
