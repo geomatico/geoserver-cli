@@ -27,17 +27,32 @@ class GeoServerTestCase(unittest.TestCase):
     def test_get_workspace_non_existing(self):
         self.assertTrue(self.gs.get_workspace('invalid') is None)
 
+    def test_get_workspace_None(self):
+        self.assertTrue(self.gs.get_workspace(None) is None)
+
     def test_get_datastores_no_workspace(self):
-        pass
+        try:
+            self.gs.get_datastores(None)
+            assert False
+        except ValueError:
+            pass
 
-    def test_get_datastores_specific_workspace(self):
-        pass
+    def test_get_datastores(self):
+        ds = self.gs.get_datastores('tiger')
+        ws = self.gs.get_workspace('tiger')
+        self.assertEqual(ds, ws.get_datastores())
 
-    def test_get_datastore_existing(self):
-        pass
+    def test_get_datastore_no_workspace(self):
+        try:
+            self.gs.get_datastore('ds', None)
+            assert False
+        except ValueError:
+            pass
 
-    def test_get_datastore_non_existing(self):
-        pass
+    def test_get_datastore(self):
+        ds = self.gs.get_datastore('tiger_roads', 'tiger')
+        ws = self.gs.get_workspace('tiger')
+        self.assertEqual(ds, ws.get_datastore('tiger_roads'))
 
     def test_get_layers(self):
         layers = self.gs.get_layers()

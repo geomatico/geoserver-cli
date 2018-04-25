@@ -34,6 +34,8 @@ class GeoServer:
                         workspaces))
 
     def get_workspace(self, name):
+        if not name:
+            return None
         try:
             json = self._get('workspaces/' + name)
         except IOError as e:
@@ -44,10 +46,16 @@ class GeoServer:
         return self._workspace_from_json(json['workspace'])
 
     def get_datastores(self, workspace):
-        pass
+        ws = self.get_workspace(workspace)
+        if not ws:
+            raise ValueError('Invalid workspace: ' + (workspace or ''))
+        return ws.get_datastores()
 
-    def get_datastore(self, name, workspace=None):
-        pass
+    def get_datastore(self, name, workspace):
+        ws = self.get_workspace(workspace)
+        if not ws:
+            raise ValueError('Invalid workspace: ' + (workspace or ''))
+        return ws.get_datastore(name)
 
     def get_layers(self):
         layers = self._get('layers')['layers']['layer']
@@ -60,7 +68,7 @@ class GeoServer:
             res = self._get(layer_info['resource']['href'])
             res_info = next(iter(res.values()))
             ws = self.get_workspace(res_info['namespace']['name'])
-            ds = self.get_datastore(res_info['store']['name'])
+            ds = ws.get_datastore(res_info['store']['name'])
 
             qualifiedName = name if ':' in name else ws.get_name() + ':' + name
             ret.append(Layer(qualifiedName, self, style, ds, ws))
