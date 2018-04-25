@@ -6,6 +6,7 @@ import logging
 from urllib.parse import urljoin
 from geoserver.Workspace import Workspace
 from geoserver.Layer import Layer
+from geoserver.LayerGroup import LayerGroup
 from geoserver.Style import Style
 
 
@@ -57,31 +58,54 @@ class GeoServer:
             raise ValueError('Invalid workspace: ' + (workspace or ''))
         return ws.get_datastore(name)
 
+    def _layer_from_json(self, layer):
+        name = layer['name']
+        layer_info = self._get('layers/' + name)['layer']
+        style = self.get_style(layer_info['defaultStyle']['name'])
+
+        res = self._get(layer_info['resource']['href'])
+        res_info = next(iter(res.values()))
+        ws = self.get_workspace(res_info['namespace']['name'])
+        ds = ws.get_datastore(res_info['store']['name'])
+
+        qualifiedName = name if ':' in name else ws.get_name() + ':' + name
+        return Layer(qualifiedName, self, style, ds, ws)
+
     def get_layers(self):
         layers = self._get('layers')['layers']['layer']
-        ret = []
-        for layer in layers:
-            name = layer['name']
-            layer_info = self._get('layers/' + name)['layer']
-            style = self.get_style(layer_info['defaultStyle']['name'])
-
-            res = self._get(layer_info['resource']['href'])
-            res_info = next(iter(res.values()))
-            ws = self.get_workspace(res_info['namespace']['name'])
-            ds = ws.get_datastore(res_info['store']['name'])
-
-            qualifiedName = name if ':' in name else ws.get_name() + ':' + name
-            ret.append(Layer(qualifiedName, self, style, ds, ws))
-        return ret
+        return map(self._layer_from_json, layers)
 
     def get_layer(self, name):
-        pass
+        if not name:
+            return None
+        try:
+            layer = self._get('layers/' + name)['layer']
+            return self._layer_from_json(layer)
+        except IOError as e:
+            logging.info(e)
+            return None
+
+    def _layergroup_from_json(self, layergroup):
+        name = layergroup['name']
+        layergroup_info = self._get('layergroups/' + name)['layerGroup']
+        published = layergroup_info['publishables']['published']
+        layersJson = map(lambda l: self._get(l['href'])['layer'], published)
+        layers = list(map(self._layer_from_json, layersJson))
+        return LayerGroup(name, self, layers)
 
     def get_layergroups(self):
-        pass
+        layers = self._get('layergroups')['layerGroups']['layerGroup']
+        return map(self._layergroup_from_json, layers)
 
     def get_layergroup(self, name):
-        pass
+        if not name:
+            return None
+        try:
+            layer = self._get('layergroups/' + name)['layerGroup']
+            return self._layergroup_from_json(layer)
+        except IOError as e:
+            logging.info(e)
+            return None
 
     def get_styles(self):
         styles = self._get('styles')['styles']['style']

@@ -2,15 +2,9 @@ from geoserver.Resource import Resource
 
 
 class LayerGroup(Resource):
-    def __init__(self, name, geoserver, description, datastore, workspace):
+    def __init__(self, name, geoserver, layers):
         Resource.__init__(self, name, geoserver)
-        pass
-
-    def get_workspace(self):
-        pass
-
-    def get_datastore(self):
-        pass
+        self.layers = layers
 
     def delete(self):
         pass
@@ -19,4 +13,4 @@ class LayerGroup(Resource):
         pass
 
     def get_layers(self):
-        pass
+        return self.layers

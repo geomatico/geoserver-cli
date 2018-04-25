@@ -69,19 +69,36 @@ class GeoServerTestCase(unittest.TestCase):
         self.assertEqual(names, expected)
 
     def test_get_layer_existing(self):
-        pass
+        layer = self.gs.get_layer('tiger:tiger_roads')
+        self.assertEqual('tiger:tiger_roads', layer.get_name())
+        self.assertEqual('tiger_roads', layer.get_default_style().get_name())
+        self.assertEqual(self.gs, layer.get_geoserver())
 
     def test_get_layer_non_existing(self):
-        pass
+        self.assertTrue(self.gs.get_layer('invalid') is None)
+
+    def test_get_layer_None(self):
+        self.assertTrue(self.gs.get_layer(None) is None)
 
     def test_get_layergroups(self):
-        pass
+        layergroups = self.gs.get_layergroups()
+        names = set(map(lambda group: group.get_name(), layergroups))
+        expected = set(['spearfish', 'tasmania', 'tiger-ny'])
+        self.assertEqual(names, expected)
 
     def test_get_layergroup_existing(self):
-        pass
+        group = self.gs.get_layergroup('spearfish')
+        self.assertEqual('spearfish', group.get_name())
+        names = set(map(lambda layer: layer.get_name(), group.get_layers()))
+        expected = set(['sf:sfdem', 'sf:streams', 'sf:roads', 'sf:restricted',
+                        'sf:archsites', 'sf:bugsites'])
+        self.assertEqual(names, expected)
 
     def test_get_layergroup_non_existing(self):
-        pass
+        self.assertTrue(self.gs.get_layergroup('invalid') is None)
+
+    def test_get_layergroup_None(self):
+        self.assertTrue(self.gs.get_layergroup(None) is None)
 
     def test_get_styles(self):
         styles = self.gs.get_styles()
