@@ -10,6 +10,7 @@ from geoserver.Layer import Layer
 from geoserver.LayerGroup import LayerGroup
 from geoserver.Style import Style
 
+
 class GeoServer:
     """
     Main class to manage a GeoServer instance.
@@ -23,6 +24,7 @@ class GeoServer:
     :type user: string
     :type pass: string
     """
+
     def __init__(self, url, user, password):
         self.base_url = url + "/"
         self.url = urljoin(self.base_url, 'rest/')
@@ -313,7 +315,7 @@ class GeoServer:
     def _get(self, path):
         return self._request(path)
 
-    def _request(self, path, #pylint: disable=too-many-arguments
+    def _request(self, path,  # pylint: disable=too-many-arguments
                  extension='.json',
                  method='get',
                  expected_code=200,
@@ -323,7 +325,10 @@ class GeoServer:
         if extension and not url.endswith(extension):
             url = url + extension
         f = getattr(requests, method.lower())
-        r = f(url, auth=(self.user, self.password), data=data, headers=headers) #pylint: disable=not-callable
+        r = f(url,  # pylint: disable=not-callable
+              auth=(self.user, self.password),
+              data=data,
+              headers=headers)
         if r.status_code != expected_code:
             msg = ("Cannot perform {} request to {}. Response code is {}"
                    .format(method, url, r.status_code))
@@ -335,3 +340,9 @@ class GeoServer:
                 return r.text
         else:
             return r.text
+
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__ and
+                self.url == other.url and
+                self.user == other.user and
+                self.password == other.password)
