@@ -1,9 +1,10 @@
+#pylint: disable=too-many-public-methods,missing-docstring
+
 import unittest
-import requests
+from test.utils import GEOSERVER_URL
 from geoserver.GeoServer import GeoServer
 from geoserver.Workspace import Workspace
 from geoserver.Style import Style
-from test.utils import *
 
 
 class GeoServerTestCase(unittest.TestCase):

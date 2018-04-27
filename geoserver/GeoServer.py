@@ -1,15 +1,14 @@
 """
 GeoServer
 """
-import requests
 import logging
 import json
 from urllib.parse import urljoin
+import requests
 from geoserver.Workspace import Workspace
 from geoserver.Layer import Layer
 from geoserver.LayerGroup import LayerGroup
 from geoserver.Style import Style
-
 
 class GeoServer:
     def __init__(self, url, user, password):
@@ -23,11 +22,11 @@ class GeoServer:
             namespaces = self._get('namespaces')['namespaces']['namespace']
 
         f = filter(lambda n: n['name'] == ws['name'], namespaces)
-        ns = next(f, None)
-        if ns:
-            ns = self._get(ns['href'])['namespace']['uri']
+        namespace = next(f, None)
+        if namespace:
+            namespace = self._get(namespace['href'])['namespace']['uri']
 
-        return Workspace(ws['name'], self, ns)
+        return Workspace(ws['name'], self, namespace)
 
     def get_workspaces(self):
         workspaces = self._get('workspaces')['workspaces']['workspace']
@@ -39,13 +38,12 @@ class GeoServer:
         if not name:
             return None
         try:
-            json = self._get('workspaces/' + name)
+            workspace = self._get('workspaces/' + name)
         except IOError as e:
             logging.info(e)
             return None
 
-        workspace = json['workspace']
-        return self._workspace_from_json(json['workspace'])
+        return self._workspace_from_json(workspace['workspace'])
 
     def get_datastores(self, workspace):
         ws = self.get_workspace(workspace)
@@ -69,8 +67,8 @@ class GeoServer:
         ws = self.get_workspace(res_info['namespace']['name'])
         ds = ws.get_datastore(res_info['store']['name'])
 
-        qualifiedName = name if ':' in name else ws.get_name() + ':' + name
-        return Layer(qualifiedName, self, style, ds, ws)
+        qualified_name = name if ':' in name else ws.get_name() + ':' + name
+        return Layer(qualified_name, self, style, ds, ws)
 
     def get_layers(self):
         layers = self._get('layers')['layers']['layer']
@@ -90,8 +88,8 @@ class GeoServer:
         name = layergroup['name']
         layergroup_info = self._get('layergroups/' + name)['layerGroup']
         published = layergroup_info['publishables']['published']
-        layersJson = map(lambda l: self._get(l['href'])['layer'], published)
-        layers = list(map(self._layer_from_json, layersJson))
+        layers_json = map(lambda l: self._get(l['href'])['layer'], published)
+        layers = list(map(self._layer_from_json, layers_json))
         return LayerGroup(name, self, layers)
 
     def get_layergroups(self):
@@ -168,7 +166,7 @@ class GeoServer:
                 'styles', method='POST', expected_code=201,
                 headers={'Content-type': 'application/json'}, data=data)
             self._request(
-                'styles/' + name, method='PUT', format='', data=sld,
+                'styles/' + name, method='PUT', extension='', data=sld,
                 headers={'Content-type': 'application/vnd.ogc.sld+xml'})
         except OSError as e:
             try:
@@ -180,17 +178,17 @@ class GeoServer:
     def _get(self, path):
         return self._request(path)
 
-    def _request(self, path,
-                 format='.json',
+    def _request(self, path, #pylint: disable=too-many-arguments
+                 extension='.json',
                  method='get',
                  expected_code=200,
-                 headers={},
+                 headers=None,
                  data=None):
         url = urljoin(self.url, path)
-        if format and not url.endswith(format):
-            url = url + format
+        if format and not url.endswith(extension):
+            url = url + extension
         f = getattr(requests, method.lower())
-        r = f(url, auth=(self.user, self.password), data=data, headers=headers)
+        r = f(url, auth=(self.user, self.password), data=data, headers=headers) #pylint: disable=not-callable
         if r.status_code != expected_code:
             msg = ("Cannot perform {} request to {}. Response code is {}"
                    .format(method, url, r.status_code))
@@ -198,7 +196,7 @@ class GeoServer:
         if format == '.json':
             try:
                 return r.json() if r.text else None
-            except Exception:
+            except ValueError:
                 return r.text
         else:
             return r.text
