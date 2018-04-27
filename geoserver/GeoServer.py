@@ -320,7 +320,7 @@ class GeoServer:
                  headers=None,
                  data=None):
         url = urljoin(self.url, path)
-        if format and not url.endswith(extension):
+        if extension and not url.endswith(extension):
             url = url + extension
         f = getattr(requests, method.lower())
         r = f(url, auth=(self.user, self.password), data=data, headers=headers) #pylint: disable=not-callable
@@ -328,7 +328,7 @@ class GeoServer:
             msg = ("Cannot perform {} request to {}. Response code is {}"
                    .format(method, url, r.status_code))
             raise IOError(msg)
-        if format == '.json':
+        if extension == '.json':
             try:
                 return r.json() if r.text else None
             except ValueError:
