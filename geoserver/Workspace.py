@@ -80,8 +80,30 @@ class Workspace(Resource):
 
         return (list(ds) or []) + (list(cs) or [])
 
+    def _get_json_or_none(self, path):
+        try:
+            return self.geoserver._request(path)
+        except IOError:
+            return None
+
     def get_datastore(self, name):
-        pass
+        """
+        Get a specific datastore from this workspace.
+
+        :param name: Name of the datastore to get.
+        :type name: string
+        :return: The required datastore or None if the datastore does not exist.
+        :rtype: :class:`geoserver.Datastore`
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        path = 'workspaces/' + self.name + '/datastores/' + name
+        ds = self._get_json_or_none(path)
+        if ds:
+            return self._get_datastore_from_json(ds['dataStore'], True)
+
+        path = 'workspaces/' + self.name + '/coveragestores/' + name
+        ds = self._get_json_or_none(path)
+        return self._get_datastore_from_json(ds['coverageStore'], False) if ds else None
 
     def get_namespace(self):
         return self.namespace

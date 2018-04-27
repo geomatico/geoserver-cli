@@ -3,6 +3,7 @@
 import unittest
 from test.utils import GEOSERVER_URL
 from geoserver.GeoServer import GeoServer
+from geoserver.Datastore import TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
 
 
 class WorkspaceTestCase(unittest.TestCase):
@@ -33,10 +34,25 @@ class WorkspaceTestCase(unittest.TestCase):
         self.assertEqual(names, expected)
 
     def test_get_datastore_existing(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        ds = ws.get_datastore('nyc')
+        self.assertEqual(self.gs, ds.get_geoserver())
+        self.assertEqual(ws, ds.get_workspace())
+        self.assertEqual('nyc', ds.get_name())
+        self.assertEqual(TYPE_SHP, ds.get_type())
+        self.assertEqual('file:data/nyc', ds.get_file())
+
+        ws = self.gs.get_workspace('nurc')
+        ds = ws.get_datastore('mosaic')
+        self.assertEqual(self.gs, ds.get_geoserver())
+        self.assertEqual(ws, ds.get_workspace())
+        self.assertEqual('mosaic', ds.get_name())
+        self.assertEqual(TYPE_GEOTIFF, ds.get_type())
+        self.assertEqual('file:coverages/mosaic_sample/mosaic.shp', ds.get_file())
 
     def test_get_datastore_non_existing(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        self.assertTrue(ws.get_datastore('invalid') is None)
 
     def test_get_namespace(self):
         pass

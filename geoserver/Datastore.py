@@ -7,12 +7,17 @@ TYPE_GEOTIFF = 'geotiff'
 
 
 class Datastore(Resource):
-    def __init__(self, name, geoserver, workspace, type, opts):
+    def __init__(self, name, geoserver, workspace, datastore_type, opts):  # pylint: disable=too-many-arguments
         Resource.__init__(self, name, geoserver)
-        pass
+        self.workspace = workspace
+        self.datastore_type = datastore_type
+        if (datastore_type == TYPE_SHP or datastore_type == TYPE_GEOTIFF):
+            self.file = opts
+        elif datastore_type == TYPE_POSTGIS:
+            self.db_params = opts
 
     def get_workspace(self):
-        pass
+        return self.workspace
 
     def delete(self):
         pass
@@ -41,7 +46,16 @@ class Datastore(Resource):
     def create_layergroup(self, name, layers):
         pass
 
+    def get_type(self):
+        return self.datastore_type
+
+    def get_file(self):
+        return self.file
+
+    def get_database_params(self):
+        return self.db_params
+
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
-            self.name == other.name and
-            self.geoserver == other.geoserver)
+                self.name == other.name and
+                self.geoserver == other.geoserver)
