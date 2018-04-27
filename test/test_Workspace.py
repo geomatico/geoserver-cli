@@ -1,17 +1,36 @@
+#pylint: disable=too-many-public-methods,missing-docstring
+
 import unittest
-from geoserver.Workspace import Workspace
-from test.utils import *
+from test.utils import GEOSERVER_URL
+from geoserver.GeoServer import GeoServer
 
 
 class WorkspaceTestCase(unittest.TestCase):
+    def setUp(self):
+        self.gs = GeoServer(GEOSERVER_URL, 'admin', 'geoserver')
+
     def test_get_geoserver(self):
-        pass
+        ws = self.gs.get_workspace('cite')
+        self.assertEqual(self.gs, ws.get_geoserver())
 
     def test_delete(self):
         pass
 
     def test_get_datastores(self):
-        pass
+        # Datastores
+        ws = self.gs.get_workspace('tiger')
+        datastores = ws.get_datastores()
+        self.assertEqual(1, len(datastores))
+        self.assertEqual('nyc', datastores[0].get_name())
+
+        # Coverage stores
+        ws = self.gs.get_workspace('nurc')
+        datastores = ws.get_datastores()
+        self.assertEqual(4, len(datastores))
+        names = set(map(lambda ds: ds.get_name(), datastores))
+        expected = set(['arcGridSample', 'img_sample2', 'mosaic',
+                        'worldImageSample'])
+        self.assertEqual(names, expected)
 
     def test_get_datastore_existing(self):
         pass

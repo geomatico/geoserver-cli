@@ -5,6 +5,14 @@ class Layer(Resource):
     def __init__(self, name, geoserver, default_style, datastore, workspace):
         Resource.__init__(self, name, geoserver)
         self.default_style = default_style
+        self.datastore = datastore
+        self.workspace = workspace
+
+    def get_datastore(self):
+        return self.datastore
+
+    def get_workspace(self):
+        return self.workspace
 
     def delete(self):
         pass

@@ -1,6 +1,11 @@
 from geoserver.Resource import Resource
 
 
+TYPE_POSTGIS = 'postgis'
+TYPE_SHP = 'shp'
+TYPE_GEOTIFF = 'geotiff'
+
+
 class Datastore(Resource):
     def __init__(self, name, geoserver, workspace, type, opts):
         Resource.__init__(self, name, geoserver)
@@ -35,3 +40,8 @@ class Datastore(Resource):
 
     def create_layergroup(self, name, layers):
         pass
+
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__ and
+            self.name == other.name and
+            self.geoserver == other.geoserver)
