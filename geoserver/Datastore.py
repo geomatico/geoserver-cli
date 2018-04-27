@@ -15,12 +15,19 @@ class Datastore(Resource):
             self.file = opts
         elif datastore_type == TYPE_POSTGIS:
             self.db_params = opts
+        else:
+            raise ValueError('Unrecognized datastore type: ' + datastore_type)
 
     def get_workspace(self):
         return self.workspace
 
     def delete(self):
-        pass
+        path = 'workspaces/' + self.workspace.get_name() + '/'
+        if self.datastore_type == TYPE_SHP or self.datastore_type == TYPE_POSTGIS:
+            path = path + 'datastores/' + self.name
+        else:
+            path = path + 'coveragestores/' + self.name
+        self.geoserver._request(path, method='DELETE')
 
     def get_layers(self):
         pass

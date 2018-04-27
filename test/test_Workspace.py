@@ -1,4 +1,4 @@
-#pylint: disable=too-many-public-methods,missing-docstring
+# pylint: disable=too-many-public-methods,missing-docstring
 
 import unittest
 from test.utils import GEOSERVER_URL
@@ -9,6 +9,14 @@ from geoserver.Datastore import TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
 class WorkspaceTestCase(unittest.TestCase):
     def setUp(self):
         self.gs = GeoServer(GEOSERVER_URL, 'admin', 'geoserver')
+        self.DEFAULT_DB_OPTS = {
+            'host': 'localhost',
+            'port': '5432',
+            'user': 'docker',
+            'password': 'docker',
+            'database': 'gis',
+            'schema': 'public'
+        }
 
     def test_get_geoserver(self):
         ws = self.gs.get_workspace('cite')
@@ -48,7 +56,8 @@ class WorkspaceTestCase(unittest.TestCase):
         self.assertEqual(ws, ds.get_workspace())
         self.assertEqual('mosaic', ds.get_name())
         self.assertEqual(TYPE_GEOTIFF, ds.get_type())
-        self.assertEqual('file:coverages/mosaic_sample/mosaic.shp', ds.get_file())
+        self.assertEqual(
+            'file:coverages/mosaic_sample/mosaic.shp', ds.get_file())
 
     def test_get_datastore_non_existing(self):
         ws = self.gs.get_workspace('tiger')
@@ -76,34 +85,131 @@ class WorkspaceTestCase(unittest.TestCase):
             pass
 
     def test_create_datastore_postgis(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                            self.DEFAULT_DB_OPTS)
+
+        ds = ws.get_datastore('new_postgis')
+        self.assertEqual('new_postgis', ds.get_name())
+        self.assertEqual(TYPE_POSTGIS, ds.get_type())
+        del self.DEFAULT_DB_OPTS['password']
+        self.assertEqual(self.DEFAULT_DB_OPTS, ds.get_database_params())
+
+        ds.delete()
 
     def test_create_datastore_postgis_invalid_schema(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        self.DEFAULT_DB_OPTS['schema'] = None
+        try:
+            ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                                self.DEFAULT_DB_OPTS)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_datastore_postgis_invalid_user(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        self.DEFAULT_DB_OPTS['user'] = None
+        try:
+            ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                                self.DEFAULT_DB_OPTS)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_datastore_postgis_invalid_pass(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        self.DEFAULT_DB_OPTS['password'] = None
+        try:
+            ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                                self.DEFAULT_DB_OPTS)
+            assert False
+        except ValueError:
+            pass
 
-    def test_create_datastore_postgis_invalid_url(self):
-        pass
+    def test_create_datastore_postgis_invalid_host(self):
+        ws = self.gs.get_workspace('tiger')
+        self.DEFAULT_DB_OPTS['host'] = None
+        try:
+            ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                                self.DEFAULT_DB_OPTS)
+            assert False
+        except ValueError:
+            pass
+
+    def test_create_datastore_postgis_invalid_port(self):
+        ws = self.gs.get_workspace('tiger')
+        self.DEFAULT_DB_OPTS['port'] = None
+        try:
+            ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                                self.DEFAULT_DB_OPTS)
+            assert False
+        except ValueError:
+            pass
+
+    def test_create_datastore_postgis_invalid_database(self):
+        ws = self.gs.get_workspace('tiger')
+        self.DEFAULT_DB_OPTS['database'] = None
+        try:
+            ws.create_datastore('new_postgis', TYPE_POSTGIS,
+                                self.DEFAULT_DB_OPTS)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_datastore_shp(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        ws.create_datastore('new_shp', TYPE_SHP, 'data/myfile.shp')
+
+        ds = ws.get_datastore('new_shp')
+        self.assertEqual('new_shp', ds.get_name())
+        self.assertEqual(TYPE_SHP, ds.get_type())
+        self.assertEqual('file:data/myfile.shp', ds.get_file())
+
+        ds.delete()
 
     def test_create_datastore_shp_invalid_file(self):
-        pass
+        try:
+            ws = self.gs.get_workspace('tiger')
+            ws.create_datastore('new_shp', TYPE_SHP, None)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_datastore_geotiff(self):
-        pass
+        ws = self.gs.get_workspace('nurc')
+        ws.create_datastore('new_geotiff', TYPE_GEOTIFF, 'data/myfile.tiff')
+
+        ds = ws.get_datastore('new_geotiff')
+        self.assertEqual('new_geotiff', ds.get_name())
+        self.assertEqual(TYPE_GEOTIFF, ds.get_type())
+        self.assertEqual('file:data/myfile.tiff', ds.get_file())
+
+        ds.delete()
 
     def test_create_datastore_geotiff_invalid_file(self):
-        pass
+        try:
+            ws = self.gs.get_workspace('nurc')
+            ws.create_datastore('new_geotiff', TYPE_GEOTIFF, None)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_datastore_invalid_type(self):
-        pass
+        try:
+            ws = self.gs.get_workspace('tiger')
+            ws.create_datastore('new_shp', 'invalid_type', 'data/myfile.shp')
+            assert False
+        except ValueError:
+            pass
+
+    def test_create_datastore_invalid_name(self):
+        try:
+            ws = self.gs.get_workspace('tiger')
+            ws.create_datastore(None, TYPE_SHP, 'data/myfile.shp')
+            assert False
+        except ValueError:
+            pass
 
 
 if __name__ == '__main__':

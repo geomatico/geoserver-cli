@@ -13,6 +13,12 @@ def _get_value_from_params(datastore, param_name):
     return value['$'] if value else None
 
 
+def _check_dict_value(opts, *keys):
+    for key in keys:
+        if not opts[key]:
+            raise ValueError('Invalid ' + key + ': ' + (opts[key] or ''))
+
+
 class Workspace(Resource):
     """
     An object representing a GeoServer workspace.
@@ -138,9 +144,102 @@ class Workspace(Resource):
             headers={'Content-type': 'application/json'}, data=ns)
         self.namespace = namespace
 
-
     def create_datastore(self, name, datastore_type, opts):
-        pass
+        """
+        Create a new datastore in this workspace.
+
+        :param name: The name of the datastore to create.
+        :param datastore_type: The type of the datastore to create.
+            Use TYPE_* constants.
+        :param opts: The options to create the datastore.
+            They vary depending on the datastore type:
+
+            * For `TYPE_SHP`: A string with the file path.
+            * For `TYPE_GEOTIFF`: A string with the file path.
+            * For `TYPE_POSTGIS`: A dict containing `host`, `port`, `database`, `schema`, `user`, `password`.
+        :type name: string
+        :type datastore_type: string
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        :raise: :class:`ValueError` if name, the datastore type or the options are not valid.
+        :rtype: None
+        """
+        if not name:
+            raise ValueError('Invalid name')
+        path = 'workspaces/' + self.name
+        data = None
+        if datastore_type == TYPE_SHP:
+            if not opts:
+                raise ValueError('Invalid file: ' + (opts or ''))
+            data = {
+                'dataStore': {
+                    'name': name,
+                    'connectionParameters': {
+                        'entry': [{
+                            '@key': 'url',
+                            '$': 'file:' + str(opts)
+                        }]
+                    }
+                }
+            }
+            path = path + '/datastores'
+        elif datastore_type == TYPE_GEOTIFF:
+            if not opts:
+                raise ValueError('Invalid file: ' + (opts or ''))
+            data = {
+                'coverageStore': {
+                    'name': name,
+                    'type': 'GeoTIFF',
+                    'url': 'file:' + str(opts),
+                    'workspace': {
+                        'name': self.name,
+                        'href': self.geoserver.url + 'workspaces/' + self.name
+                    }
+                }
+            }
+            path = path + '/coveragestores'
+        elif datastore_type == TYPE_POSTGIS:
+            _check_dict_value(opts, 'host', 'port', 'database', 'user',
+                              'password', 'schema')
+            data = {
+                'dataStore': {
+                    'name': name,
+                    'connectionParameters': {
+                        'entry': [{
+                            '@key': 'host',
+                            '$': opts['host']
+                        }, {
+                            '@key': 'port',
+                            '$': opts['port']
+                        }, {
+                            '@key': 'database',
+                            '$': opts['database']
+                        }, {
+                            '@key': 'user',
+                            '$': opts['user']
+                        }, {
+                            '@key': 'passwd',
+                            '$': opts['password']
+                        }, {
+                            '@key': 'schema',
+                            '$': opts['schema']
+                        }, {
+                            '@key': 'passwd',
+                            '$': opts['password']
+                        }, {
+                            '@key': 'dbtype',
+                            '$': 'postgis'
+                        }]
+                    }
+                }
+            }
+            path = path + '/datastores'
+
+        if not data:
+            raise ValueError('Unrecognized datastore type: ' + datastore_type)
+
+        self.geoserver._request(
+            path, method='POST', expected_code=201,
+            headers={'Content-type': 'application/json'}, data=json.dumps(data))
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
