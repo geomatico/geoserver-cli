@@ -55,13 +55,25 @@ class WorkspaceTestCase(unittest.TestCase):
         self.assertTrue(ws.get_datastore('invalid') is None)
 
     def test_get_namespace(self):
-        pass
+        ws = self.gs.get_workspace('tiger')
+        self.assertEqual('http://www.census.gov', ws.get_namespace())
 
     def test_set_namespace(self):
-        pass
+        original = 'http://www.census.gov'
+        ws = self.gs.get_workspace('tiger')
+        self.assertEqual(original, ws.get_namespace())
+        ws.set_namespace('another')
+        ws = self.gs.get_workspace('tiger')
+        self.assertEqual('another', ws.get_namespace())
+        ws.set_namespace(original)
+        self.assertEqual(original, ws.get_namespace())
 
     def test_set_namespace_invalid(self):
-        pass
+        try:
+            self.gs.get_workspace('tiger').set_namespace(None)
+            assert False
+        except ValueError:
+            pass
 
     def test_create_datastore_postgis(self):
         pass

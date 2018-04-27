@@ -2,6 +2,7 @@
 """
 Workspace
 """
+import json
 from geoserver.Resource import Resource
 from geoserver.Datastore import Datastore, TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
 
@@ -37,20 +38,20 @@ class Workspace(Resource):
         """
         self.geoserver._request('workspaces/' + self.name, method='DELETE')
 
-    def _get_datastore_from_json(self, json, is_vector):
-        name = json['name']
+    def _get_datastore_from_json(self, datastore, is_vector):
+        name = datastore['name']
         url = _get_value_from_params(
-            json, 'url') if is_vector else json['url']
+            datastore, 'url') if is_vector else datastore['url']
         if url:
             datastore_type = TYPE_SHP if is_vector else TYPE_GEOTIFF
             return Datastore(name, self.geoserver, self, datastore_type, url)
-        elif json['type'] == 'PostGIS':
+        elif datastore['type'] == 'PostGIS':
             opts = {
-                'host': _get_value_from_params(json, 'host'),
-                'port': _get_value_from_params(json, 'port'),
-                'database': _get_value_from_params(json, 'database'),
-                'schema': _get_value_from_params(json, 'schema'),
-                'user': _get_value_from_params(json, 'user')
+                'host': _get_value_from_params(datastore, 'host'),
+                'port': _get_value_from_params(datastore, 'port'),
+                'database': _get_value_from_params(datastore, 'database'),
+                'schema': _get_value_from_params(datastore, 'schema'),
+                'user': _get_value_from_params(datastore, 'user')
             }
             return Datastore(name, self.geoserver, self, TYPE_POSTGIS, opts)
 
@@ -106,10 +107,37 @@ class Workspace(Resource):
         return self._get_datastore_from_json(ds['coverageStore'], False) if ds else None
 
     def get_namespace(self):
+        """
+        Gets the namespace of the workspace.
+
+        :return: The namespace.
+        :rtype: string.
+        """
         return self.namespace
 
-    def set_namespace(self):
-        pass
+    def set_namespace(self, namespace):
+        """
+        Sets the namespace of the workspace.
+
+        :param namespace: The namespace to set.
+        :type namespace: string.
+        :rtype: None
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        :raise: :class:`ValueError` if the namespace is not valid.
+        """
+        if not namespace:
+            raise ValueError('Invalid namespace')
+        ns = json.dumps({
+            'namespace': {
+                'prefix': self.name,
+                'uri': namespace
+            }
+        })
+        self.geoserver._request(
+            'namespaces/' + self.name, method='PUT',
+            headers={'Content-type': 'application/json'}, data=ns)
+        self.namespace = namespace
+
 
     def create_datastore(self, name, datastore_type, opts):
         pass
