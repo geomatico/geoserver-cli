@@ -207,7 +207,34 @@ class Datastore(Resource):
             self.file = 'file:' + file
 
     def create_layer(self, name):
-        pass
+        """
+        Creates a new layer in this datastore.
+
+        :param name: The name of the layer to create (it must exist in the datastore).
+        :type name: string
+        :rtype: None
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        path = 'workspaces/' + self.workspace.get_name()
+        if self.datastore_type == TYPE_GEOTIFF:
+            path = path + '/coveragestores/' + self.name + '/coverages'
+            data = {
+                'coverage' : {
+                    'name': name,
+                    'nativeName': name
+                }
+            }
+        else:
+            path = path + '/datastores/' + self.name + '/featuretypes'
+            data = {
+                'featureType' : {
+                    'name': name
+                }
+            }
+
+        self.geoserver._request(
+            path, method='POST', expected_code=201,
+            headers={'Content-type': 'application/json'}, data=json.dumps(data))
 
     def get_type(self):
         """

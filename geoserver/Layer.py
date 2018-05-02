@@ -15,7 +15,8 @@ class Layer(Resource):
         return self.workspace
 
     def delete(self):
-        pass
+        self.geoserver._request('layers/' + self.name, method='DELETE')
+        self.geoserver.reload()
 
     def set_default_style(self, style):
         self.default_style = style

@@ -164,11 +164,40 @@ class LayerTestCase(unittest.TestCase):
         except TypeError:
             ds.delete()
 
-    def test_create_layer(self):
-        pass
+    def test_create_layer_vector(self):
+        ds = self.gs.get_datastore('states_shapefile', 'topp')
+        self.assertEqual(1, len(ds.get_layers()))
+        ds.get_layer('states').delete()
+        self.assertEqual(0, len(ds.get_layers()))
+        ds.create_layer('states')
+        layers = ds.get_layers()
+        self.assertEqual(1, len(layers))
+        self.assertEqual('topp:states', layers[0].get_name())
+
+
+    def test_create_layer_raster(self):
+        ds = self.gs.get_datastore('sfdem', 'sf')
+        self.assertEqual(1, len(ds.get_layers()))
+        ds.get_layer('sfdem').delete()
+        self.assertEqual(0, len(ds.get_layers()))
+        ds.create_layer('sfdem')
+        layers = ds.get_layers()
+        self.assertEqual(1, len(layers))
+        self.assertEqual('sf:sfdem', layers[0].get_name())
+
+    def test_create_layer_existing(self):
+        ds = self.gs.get_datastore('states_shapefile', 'topp')
+        try:
+            ds.create_layer('states')
+        except IOError:
+            pass
 
     def test_create_layer_invalid(self):
-        pass
+        ds = self.gs.get_datastore('states_shapefile', 'topp')
+        try:
+            ds.create_layer('invalid')
+        except IOError:
+            pass
 
     def test_get_file_postgis(self):
         ds = self._create_postgis_datastore()
