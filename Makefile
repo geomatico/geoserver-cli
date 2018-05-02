@@ -21,6 +21,14 @@ doc:
 	@sphinx-apidoc -feo docs/source geoserver geoserver/cli
 	@cd docs && make clean html
 
-.PHONY: docker-run
-docker-run:
-	docker run -d -p 8080:8080 -v ${PWD}/test/geoserver_data_dir:/var/local/geoserver --name=geoserver-cli-test oscarfonts/geoserver:latest
+.PHONY: docker-run-latest
+docker-run-latest:
+	@rm -rf test/data
+	@cp -r test/geoserver_data_dir test/data
+	docker run -d -p 8080:8080 -v ${PWD}/test/data:/var/local/geoserver --name=geoserver-cli-test oscarfonts/geoserver:latest
+
+.PHONY: docker-run-maintenance
+docker-run-maintenance:
+	@rm -rf test/data
+	@cp -r test/geoserver_data_dir test/data
+	docker run -d -p 8080:8080 -v ${PWD}/test/data:/var/local/geoserver --name=geoserver-cli-test-maintenance oscarfonts/geoserver:2.12.2

@@ -1,16 +1,12 @@
 # pylint: disable=too-many-public-methods,missing-docstring
 
 import unittest
-from test.utils import GEOSERVER_URL
-from geoserver.GeoServer import GeoServer
+from test.AbstractGeoServerTestCase import AbstractGeoServerTestCase
 from geoserver.Workspace import Workspace
 from geoserver.Style import Style
 
 
-class GeoServerTestCase(unittest.TestCase):
-    def setUp(self):
-        self.gs = GeoServer(GEOSERVER_URL, 'admin', 'geoserver')
-
+class GeoServerTestCase(AbstractGeoServerTestCase):
     def test_get_workspaces(self):
         workspaces = self.gs.get_workspaces()
         names = set(map(lambda ws: ws.get_name(), workspaces))
@@ -128,8 +124,6 @@ class GeoServerTestCase(unittest.TestCase):
         self.assertEqual('http://geomati.co', ws.get_namespace())
         self.assertEqual(self.gs, ws.get_geoserver())
 
-        ws.delete()
-
     def test_create_workspace_invalid_name(self):
         try:
             self.gs.create_workspace(None, 'http://geomati.co')
@@ -150,8 +144,6 @@ class GeoServerTestCase(unittest.TestCase):
         self.gs.create_style('new_style', sld)
         style = self.gs.get_style('new_style')
         self.assertEqual('new_style', style.get_name())
-
-        style.delete()
 
     def test_create_style_invalid_name(self):
         with open('test/sample.sld') as f:

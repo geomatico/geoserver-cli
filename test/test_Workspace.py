@@ -1,29 +1,14 @@
 # pylint: disable=too-many-public-methods,missing-docstring
 
 import unittest
-from test.utils import GEOSERVER_URL
-from geoserver.GeoServer import GeoServer
+from test.AbstractGeoServerTestCase import AbstractGeoServerTestCase
 from geoserver.Datastore import TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
 
 
-class WorkspaceTestCase(unittest.TestCase):
-    def setUp(self):
-        self.gs = GeoServer(GEOSERVER_URL, 'admin', 'geoserver')
-        self.DEFAULT_DB_OPTS = {
-            'host': 'localhost',
-            'port': '5432',
-            'user': 'docker',
-            'password': 'docker',
-            'database': 'gis',
-            'schema': 'public'
-        }
-
+class WorkspaceTestCase(AbstractGeoServerTestCase):
     def test_get_geoserver(self):
         ws = self.gs.get_workspace('cite')
         self.assertEqual(self.gs, ws.get_geoserver())
-
-    def test_delete(self):
-        pass
 
     def test_get_datastores(self):
         # Datastores
@@ -104,8 +89,6 @@ class WorkspaceTestCase(unittest.TestCase):
         del self.DEFAULT_DB_OPTS['password']
         self.assertEqual(self.DEFAULT_DB_OPTS, ds.get_database_params())
 
-        ds.delete()
-
     def test_create_datastore_postgis_invalid_schema(self):
         ws = self.gs.get_workspace('tiger')
         self.DEFAULT_DB_OPTS['schema'] = None
@@ -175,8 +158,6 @@ class WorkspaceTestCase(unittest.TestCase):
         self.assertEqual(TYPE_SHP, ds.get_type())
         self.assertEqual('file:data/myfile.shp', ds.get_file())
 
-        ds.delete()
-
     def test_create_datastore_shp_invalid_file(self):
         try:
             ws = self.gs.get_workspace('tiger')
@@ -193,8 +174,6 @@ class WorkspaceTestCase(unittest.TestCase):
         self.assertEqual('new_geotiff', ds.get_name())
         self.assertEqual(TYPE_GEOTIFF, ds.get_type())
         self.assertEqual('file:data/myfile.tiff', ds.get_file())
-
-        ds.delete()
 
     def test_create_datastore_geotiff_invalid_file(self):
         try:
