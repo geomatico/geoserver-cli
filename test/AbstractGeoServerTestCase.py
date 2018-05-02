@@ -18,6 +18,5 @@ class AbstractGeoServerTestCase(unittest.TestCase):
             'schema': 'public'
         }
 
-        subprocess.call(["rsync", "-avz", "--delete", "test/geoserver_data_dir/", "test/data"],
-                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.call(["rsync", "-avz", "--delete", "test/geoserver_data_dir/", "test/data"])
         self.gs.reload()
