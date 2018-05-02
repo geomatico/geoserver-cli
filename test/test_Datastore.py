@@ -1,19 +1,34 @@
+# pylint: disable=too-many-public-methods,missing-docstring
+
 import unittest
-from geoserver.Style import Style
+from test.utils import GEOSERVER_URL
+from geoserver.GeoServer import GeoServer
 
 
 class LayerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.gs = GeoServer(GEOSERVER_URL, 'admin', 'geoserver')
+
     def test_get_geoserver(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertEqual(self.gs, ds.get_geoserver())
 
     def test_delete(self):
         pass
 
     def test_get_workspace(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertEqual(ds.get_workspace(), self.gs.get_workspace('tiger'))
 
     def test_get_layers(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        layers = ds.get_layers()
+        names = set(map(lambda ds: ds.get_name(), layers))
+        expected = set(['tiger:giant_polygon',
+                        'tiger:poi',
+                        'tiger:poly_landmarks',
+                        'tiger:tiger_roads'])
+        self.assertEqual(names, expected)
 
     def test_get_layer_existing(self):
         pass

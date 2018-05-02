@@ -59,6 +59,15 @@ class WorkspaceTestCase(unittest.TestCase):
         self.assertEqual(
             'file:coverages/mosaic_sample/mosaic.shp', ds.get_file())
 
+    def test_get_datastore_qualified_name(self):
+        ws = self.gs.get_workspace('tiger')
+        ds = ws.get_datastore('tiger:nyc')
+        self.assertEqual(self.gs, ds.get_geoserver())
+        self.assertEqual(ws, ds.get_workspace())
+        self.assertEqual('nyc', ds.get_name())
+        self.assertEqual(TYPE_SHP, ds.get_type())
+        self.assertEqual('file:data/nyc', ds.get_file())
+
     def test_get_datastore_non_existing(self):
         ws = self.gs.get_workspace('tiger')
         self.assertTrue(ws.get_datastore('invalid') is None)

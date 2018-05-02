@@ -101,8 +101,14 @@ class Workspace(Resource):
         :type name: string
         :return: The required datastore or None if the datastore does not exist.
         :rtype: :class:`geoserver.Datastore`
+        :raise: :class:`ValueError` if the name is invalid (contains, more than one colon symbol, the qualified name belongs to a different workspace, etc.)
         :raise: :class:`IOError` if any error occurs while requesting the REST API.
         """
+        if ':' in name:
+            parts = name.split(':')
+            if len(parts) > 2 or self.name != parts[0]:
+                raise ValueError('Invalid name: ' + name)
+            name = parts[1]
         path = 'workspaces/' + self.name + '/datastores/' + name
         ds = self._get_json_or_none(path)
         if ds:

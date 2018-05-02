@@ -58,7 +58,16 @@ class Datastore(Resource):
         self.geoserver._request(path, method='DELETE')
 
     def get_layers(self):
-        pass
+        """
+        Get all the layers in this datastore.
+
+        :return: All the layers in this datastore.
+        :rtype: List of :class:`geoserver.Layer`
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        layers = self.geoserver.get_layers()
+        return list(filter(lambda l: l.get_datastore() == self, layers))
+
 
     def get_layer(self, name):
         pass
@@ -93,4 +102,5 @@ class Datastore(Resource):
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
                 self.name == other.name and
+                self.workspace == other.workspace and
                 self.geoserver == other.geoserver)
