@@ -152,12 +152,6 @@ class Datastore(Resource):
         layer = self.geoserver.get_layer(name)
         return layer if layer is not None and layer.get_datastore() == self else None
 
-    def get_layergroups(self):
-        pass
-
-    def get_layergroup(self, name):
-        pass
-
     def set_database_params(self, params):
         """
         Sets the database params for a PostGIS datastore.
@@ -213,9 +207,6 @@ class Datastore(Resource):
             self.file = 'file:' + file
 
     def create_layer(self, name):
-        pass
-
-    def create_layergroup(self, name, layers):
         pass
 
     def get_type(self):
