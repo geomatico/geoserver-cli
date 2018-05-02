@@ -4,11 +4,15 @@ Workspace
 """
 import json
 from geoserver.Resource import Resource
-from geoserver.Datastore import Datastore, _get_dict_from_db_params, TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
+from geoserver.Datastore import Datastore, _get_dict_from_db_params,\
+    _get_dict_from_shp_file, _get_dict_from_geotiff_file,\
+    TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
 
 
 def _get_value_from_params(datastore, param_name):
     params = datastore['connectionParameters']['entry']
+    if not isinstance(params, list):
+        params = [params]
     value = next(filter(lambda p: p['@key'] == param_name, params), None)
     return value['$'] if value else None
 
@@ -176,32 +180,12 @@ class Workspace(Resource):
         if datastore_type == TYPE_SHP:
             if not opts:
                 raise ValueError('Invalid file: ' + (opts or ''))
-            data = {
-                'dataStore': {
-                    'name': name,
-                    'connectionParameters': {
-                        'entry': [{
-                            '@key': 'url',
-                            '$': 'file:' + str(opts)
-                        }]
-                    }
-                }
-            }
+            data = _get_dict_from_shp_file(name, opts)
             path = path + '/datastores'
         elif datastore_type == TYPE_GEOTIFF:
             if not opts:
                 raise ValueError('Invalid file: ' + (opts or ''))
-            data = {
-                'coverageStore': {
-                    'name': name,
-                    'type': 'GeoTIFF',
-                    'url': 'file:' + str(opts),
-                    'workspace': {
-                        'name': self.name,
-                        'href': self.geoserver.url + 'workspaces/' + self.name
-                    }
-                }
-            }
+            data = _get_dict_from_geotiff_file(name, opts, self)
             path = path + '/coveragestores'
         elif datastore_type == TYPE_POSTGIS:
             _check_dict_value(opts, 'host', 'port', 'database', 'user',

@@ -11,6 +11,34 @@ TYPE_SHP = 'shp'
 TYPE_GEOTIFF = 'geotiff'
 
 
+def _get_dict_from_shp_file(name, file):
+    return {
+        'dataStore': {
+            'name': name,
+            'connectionParameters': {
+                'entry': [{
+                    '@key': 'url',
+                    '$': 'file:' + str(file)
+                }]
+            }
+        }
+    }
+
+
+def _get_dict_from_geotiff_file(name, file, workspace):
+    return {
+        'coverageStore': {
+            'name': name,
+            'type': 'GeoTIFF',
+            'url': 'file:' + str(file),
+            'workspace': {
+                'name': workspace.name,
+                'href': workspace.geoserver.url + 'workspaces/' + workspace.name
+            }
+        }
+    }
+
+
 def _get_dict_from_db_params(name, opts):
     data = {
         'dataStore': {
@@ -155,7 +183,34 @@ class Datastore(Resource):
         self.db_params = new_params
 
     def set_file(self, file):
-        pass
+        """
+        Sets the file for a SHP or GeoTIFF datastore.
+
+        :param file: The path of the file to set.
+        :type file: string
+        :rtype: None
+        :raise: :class:`TypeError` if the datastore type is PostGIS.
+        :raise: :class:`ValueError` if the file is invalid.
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        if self.datastore_type == TYPE_POSTGIS:
+            raise TypeError(
+                'Cannot set file for type: ' + self.datastore_type)
+        if not file:
+            raise ValueError('Invalid file: ' + (file or ''))
+        ws = self.workspace
+        if self.datastore_type == TYPE_GEOTIFF:
+            data = _get_dict_from_geotiff_file(self.name, file, ws)
+            path = 'workspaces/' + ws.get_name() + '/coveragestores/' + self.name
+        elif self.datastore_type == TYPE_SHP:
+            data = _get_dict_from_shp_file(self.name, file)
+            path = 'workspaces/' + ws.get_name() + '/datastores/' + self.name
+
+        if data and path:
+            self.geoserver._request(
+                path, method='PUT',
+                headers={'Content-type': 'application/json'}, data=json.dumps(data))
+            self.file = 'file:' + file
 
     def create_layer(self, name):
         pass

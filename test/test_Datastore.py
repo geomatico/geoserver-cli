@@ -28,9 +28,6 @@ class LayerTestCase(unittest.TestCase):
         ds = self.gs.get_datastore('nyc', 'tiger')
         self.assertEqual(self.gs, ds.get_geoserver())
 
-    def test_delete(self):
-        pass
-
     def test_get_workspace(self):
         ds = self.gs.get_datastore('nyc', 'tiger')
         self.assertEqual(ds.get_workspace(), self.gs.get_workspace('tiger'))
@@ -120,19 +117,52 @@ class LayerTestCase(unittest.TestCase):
             ds.delete()
 
     def test_set_file_shp(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertEqual('file:data/nyc', ds.get_file())
+
+        ds.set_file('new_file')
+        self.assertEqual('file:new_file', ds.get_file())
+
+        ds.set_file('data/nyc')
+        self.assertEqual('file:data/nyc', ds.get_file())
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertEqual('file:data/nyc', ds.get_file())
 
     def test_set_file_shp_invalid(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        try:
+            ds.set_file(None)
+            assert False
+        except ValueError:
+            pass
 
     def test_set_file_geotiff(self):
-        pass
+        ds = self.gs.get_datastore('sfdem', 'sf')
+        self.assertEqual('file:data/sf/sfdem.tif', ds.get_file())
+
+        ds.set_file('new_file')
+        self.assertEqual('file:new_file', ds.get_file())
+
+        ds.set_file('data/sf/sfdem.tif')
+        self.assertEqual('file:data/sf/sfdem.tif', ds.get_file())
+        ds = self.gs.get_datastore('sfdem', 'sf')
+        self.assertEqual('file:data/sf/sfdem.tif', ds.get_file())
 
     def test_set_file_geotiff_invalid(self):
-        pass
+        ds = self.gs.get_datastore('sfdem', 'sf')
+        try:
+            ds.set_file(None)
+            assert False
+        except ValueError:
+            pass
 
     def test_set_file_postgis(self):
-        pass
+        ds = self._create_postgis_datastore()
+        try:
+            ds.set_file(None)
+            assert False
+        except TypeError:
+            ds.delete()
 
     def test_create_layer(self):
         pass
