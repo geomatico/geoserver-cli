@@ -1,4 +1,4 @@
-#pylint: disable=too-many-public-methods,missing-docstring
+# pylint: disable=too-many-public-methods,missing-docstring
 
 import unittest
 from test.utils import GEOSERVER_URL
@@ -84,15 +84,17 @@ class GeoServerTestCase(unittest.TestCase):
     def test_get_layergroups(self):
         layergroups = self.gs.get_layergroups()
         names = set(map(lambda group: group.get_name(), layergroups))
-        expected = set(['spearfish', 'tasmania', 'tiger-ny'])
+        expected = set(['tasmania', 'tiger-ny'])
         self.assertEqual(names, expected)
 
     def test_get_layergroup_existing(self):
-        group = self.gs.get_layergroup('spearfish')
-        self.assertEqual('spearfish', group.get_name())
+        group = self.gs.get_layergroup('tasmania')
+        self.assertEqual('tasmania', group.get_name())
         names = set(map(lambda layer: layer.get_name(), group.get_layers()))
-        expected = set(['sf:sfdem', 'sf:streams', 'sf:roads', 'sf:restricted',
-                        'sf:archsites', 'sf:bugsites'])
+        expected = set(['topp:tasmania_state_boundaries',
+                        'topp:tasmania_roads',
+                        'topp:tasmania_cities',
+                        'topp:tasmania_water_bodies'])
         self.assertEqual(names, expected)
 
     def test_get_layergroup_non_existing(self):
