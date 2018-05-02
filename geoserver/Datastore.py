@@ -1,3 +1,7 @@
+# pylint: disable=W0212
+"""
+Datastore
+"""
 from geoserver.Resource import Resource
 
 
@@ -7,6 +11,24 @@ TYPE_GEOTIFF = 'geotiff'
 
 
 class Datastore(Resource):
+    """
+    An object representing a GeoServer store (including datastores, coveragestores, etc.).
+
+    :param name: The name of the workspace
+    :param geoserver: The :class:`geoserver.GeoServer` instance this workspace belongs to.
+    :param workspace: The workspace containing this datastore.
+    :param datastore_type: The type of the datastore to create. Use TYPE_* constants.
+    :param opts: The options to create the datastore.
+        They vary depending on the datastore type:
+
+        * For `TYPE_SHP`: A string with the file path.
+        * For `TYPE_GEOTIFF`: A string with the file path.
+        * For `TYPE_POSTGIS`: A dict containing `host`, `port`, `database`, `schema`, `user`, `password`.
+    :type name: string
+    :type geoserver: :class:`geoserver.GeoServer`
+    :type workspace: :class:`geoserver.Workspace`
+    :type datastore_type: string
+    """
     def __init__(self, name, geoserver, workspace, datastore_type, opts):  # pylint: disable=too-many-arguments
         Resource.__init__(self, name, geoserver)
         self.workspace = workspace
@@ -19,6 +41,12 @@ class Datastore(Resource):
             raise ValueError('Unrecognized datastore type: ' + datastore_type)
 
     def get_workspace(self):
+        """
+        Gets the workspace this datastore belongs to.
+
+        :return: The workspace containing this datastore.
+        :rtype: :class:`geoserver.Workspace`
+        """
         return self.workspace
 
     def delete(self):
