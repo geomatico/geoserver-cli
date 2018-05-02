@@ -89,6 +89,8 @@ class WorkspaceTestCase(AbstractGeoServerTestCase):
         del self.DEFAULT_DB_OPTS['password']
         self.assertEqual(self.DEFAULT_DB_OPTS, ds.get_database_params())
 
+        ds.delete()
+
     def test_create_datastore_postgis_invalid_schema(self):
         ws = self.gs.get_workspace('tiger')
         self.DEFAULT_DB_OPTS['schema'] = None
@@ -158,6 +160,8 @@ class WorkspaceTestCase(AbstractGeoServerTestCase):
         self.assertEqual(TYPE_SHP, ds.get_type())
         self.assertEqual('file:data/myfile.shp', ds.get_file())
 
+        ds.delete()
+
     def test_create_datastore_shp_invalid_file(self):
         try:
             ws = self.gs.get_workspace('tiger')
@@ -174,6 +178,8 @@ class WorkspaceTestCase(AbstractGeoServerTestCase):
         self.assertEqual('new_geotiff', ds.get_name())
         self.assertEqual(TYPE_GEOTIFF, ds.get_type())
         self.assertEqual('file:data/myfile.tiff', ds.get_file())
+
+        ds.delete()
 
     def test_create_datastore_geotiff_invalid_file(self):
         try:

@@ -5,12 +5,14 @@ from test.AbstractGeoServerTestCase import AbstractGeoServerTestCase
 from geoserver.Datastore import TYPE_POSTGIS, TYPE_SHP, TYPE_GEOTIFF
 
 
+
 class DatastoreTestCase(AbstractGeoServerTestCase):
     def _create_postgis_datastore(self):
         ws = self.gs.get_workspace('tiger')
         ws.create_datastore('new_postgis', TYPE_POSTGIS,
                             self.DEFAULT_DB_OPTS)
-        return ws.get_datastore('new_postgis')
+        datastore = ws.get_datastore('new_postgis')
+        return datastore
 
     def test_get_geoserver(self):
         ds = self.gs.get_datastore('nyc', 'tiger')
@@ -60,6 +62,8 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
         ds.set_database_params(new_params)
         self.assertEqual(new_params, ds.get_database_params())
 
+        ds.delete()
+
     def test_set_database_params_some(self):
         ds = self._create_postgis_datastore()
         del self.DEFAULT_DB_OPTS['password']
@@ -76,6 +80,8 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
         self.assertEqual('public', db_params['schema'])
         self.assertEqual('docker', db_params['user'])
 
+        ds.delete()
+
     def test_set_database_params_invalid(self):
         ds = self._create_postgis_datastore()
         del self.DEFAULT_DB_OPTS['password']
@@ -87,6 +93,8 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
         ds.set_database_params(new_params)
         self.assertEqual(self.DEFAULT_DB_OPTS, ds.get_database_params())
 
+        ds.delete()
+
     def test_set_database_params_not_postgis(self):
         ws = self.gs.get_workspace('tiger')
         ws.create_datastore('new_shp', TYPE_SHP, 'data/myfile.shp')
@@ -96,7 +104,7 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
             ds.set_database_params({'host': 'another_host.com'})
             assert False
         except TypeError:
-            pass
+            ds.delete()
 
     def test_set_file_shp(self):
         ds = self.gs.get_datastore('nyc', 'tiger')
@@ -144,7 +152,7 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
             ds.set_file(None)
             assert False
         except TypeError:
-            pass
+            ds.delete()
 
     def test_create_layer_vector(self):
         ds = self.gs.get_datastore('states_shapefile', 'topp')
@@ -187,7 +195,7 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
             ds.get_file()
             assert False
         except TypeError:
-            pass
+            ds.delete()
 
     def test_get_file_shp(self):
         ds = self.gs.get_datastore('nyc', 'tiger')
@@ -200,6 +208,7 @@ class DatastoreTestCase(AbstractGeoServerTestCase):
     def test_get_type_postgis(self):
         ds = self._create_postgis_datastore()
         self.assertEqual(TYPE_POSTGIS, ds.get_type())
+        ds.delete()
 
     def test_get_type_shp(self):
         ds = self.gs.get_datastore('nyc', 'tiger')

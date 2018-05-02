@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 import unittest
-import subprocess
 from geoserver.GeoServer import GeoServer
 
 
@@ -17,6 +16,3 @@ class AbstractGeoServerTestCase(unittest.TestCase):
             'database': 'gis',
             'schema': 'public'
         }
-
-        subprocess.call(["rsync", "-avz", "--delete", "test/geoserver_data_dir/", "test/data"])
-        self.gs.reload()
