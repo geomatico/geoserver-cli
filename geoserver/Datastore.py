@@ -2,12 +2,48 @@
 """
 Datastore
 """
+import json
 from geoserver.Resource import Resource
 
 
 TYPE_POSTGIS = 'postgis'
 TYPE_SHP = 'shp'
 TYPE_GEOTIFF = 'geotiff'
+
+
+def _get_dict_from_db_params(name, opts):
+    data = {
+        'dataStore': {
+            'name': name,
+            'connectionParameters': {
+                'entry': [{
+                    '@key': 'host',
+                    '$': opts['host']
+                }, {
+                    '@key': 'port',
+                    '$': opts['port']
+                }, {
+                    '@key': 'database',
+                    '$': opts['database']
+                }, {
+                    '@key': 'user',
+                    '$': opts['user']
+                }, {
+                    '@key': 'schema',
+                    '$': opts['schema']
+                }, {
+                    '@key': 'dbtype',
+                    '$': 'postgis'
+                }]
+            }
+        }
+    }
+    if 'password' in opts:
+        data['dataStore']['connectionParameters']['entry'].append({
+            '@key': 'passwd',
+            '$': opts['password']
+        })
+    return data
 
 
 class Datastore(Resource):
@@ -29,6 +65,7 @@ class Datastore(Resource):
     :type workspace: :class:`geoserver.Workspace`
     :type datastore_type: string
     """
+
     def __init__(self, name, geoserver, workspace, datastore_type, opts):  # pylint: disable=too-many-arguments
         Resource.__init__(self, name, geoserver)
         self.workspace = workspace
@@ -94,7 +131,28 @@ class Datastore(Resource):
         pass
 
     def set_database_params(self, params):
-        pass
+        """
+        Sets the database params for a PostGIS datastore.
+
+        :param opts: A dictionary containing some of these keys `host`, `port`, `database`, `schema`, `user`, `password`. Other keys are ignored.
+        :type opts: Dictionary
+        :rtype: None
+        :raise: :class:`ValueError` if the datastore type is not PostGIS.
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        if self.datastore_type != TYPE_POSTGIS:
+            raise ValueError(
+                'Cannot set database params for type: ' + self.datastore_type)
+        valid_keys = ('host', 'port', 'database', 'schema', 'user', 'password')
+        valid_params = {k: params[k] for k in valid_keys if k in params}
+        new_params = self.db_params.copy()
+        new_params.update(valid_params)
+        data = _get_dict_from_db_params(self.name, new_params)
+        path = 'workspaces/' + self.workspace.get_name() + '/datastores/' + self.name
+        self.geoserver._request(
+            path, method='PUT',
+            headers={'Content-type': 'application/json'}, data=json.dumps(data))
+        self.db_params = new_params
 
     def set_file(self, file):
         pass

@@ -1,10 +1,10 @@
-# pylint: disable=W0212
+# pylint: disable=W0212,C0301
 """
 Workspace
 """
 import json
 from geoserver.Resource import Resource
-from geoserver.Datastore import Datastore, TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
+from geoserver.Datastore import Datastore, _get_dict_from_db_params, TYPE_SHP, TYPE_POSTGIS, TYPE_GEOTIFF
 
 
 def _get_value_from_params(datastore, param_name):
@@ -206,38 +206,7 @@ class Workspace(Resource):
         elif datastore_type == TYPE_POSTGIS:
             _check_dict_value(opts, 'host', 'port', 'database', 'user',
                               'password', 'schema')
-            data = {
-                'dataStore': {
-                    'name': name,
-                    'connectionParameters': {
-                        'entry': [{
-                            '@key': 'host',
-                            '$': opts['host']
-                        }, {
-                            '@key': 'port',
-                            '$': opts['port']
-                        }, {
-                            '@key': 'database',
-                            '$': opts['database']
-                        }, {
-                            '@key': 'user',
-                            '$': opts['user']
-                        }, {
-                            '@key': 'passwd',
-                            '$': opts['password']
-                        }, {
-                            '@key': 'schema',
-                            '$': opts['schema']
-                        }, {
-                            '@key': 'passwd',
-                            '$': opts['password']
-                        }, {
-                            '@key': 'dbtype',
-                            '$': 'postgis'
-                        }]
-                    }
-                }
-            }
+            data = _get_dict_from_db_params(name, opts)
             path = path + '/datastores'
 
         if not data:
