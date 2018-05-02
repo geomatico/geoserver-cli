@@ -3,7 +3,7 @@
 import unittest
 from test.utils import GEOSERVER_URL
 from geoserver.GeoServer import GeoServer
-from geoserver.Datastore import TYPE_POSTGIS, TYPE_SHP
+from geoserver.Datastore import TYPE_POSTGIS, TYPE_SHP, TYPE_GEOTIFF
 
 
 class LayerTestCase(unittest.TestCase):
@@ -116,7 +116,7 @@ class LayerTestCase(unittest.TestCase):
         try:
             ds.set_database_params({'host': 'another_host.com'})
             assert False
-        except ValueError:
+        except TypeError:
             ds.delete()
 
     def test_set_file_shp(self):
@@ -131,7 +131,7 @@ class LayerTestCase(unittest.TestCase):
     def test_set_file_geotiff_invalid(self):
         pass
 
-    def test_set_file_not_shp_or_geotiff(self):
+    def test_set_file_postgis(self):
         pass
 
     def test_create_layer(self):
@@ -140,11 +140,48 @@ class LayerTestCase(unittest.TestCase):
     def test_create_layer_invalid(self):
         pass
 
-    def test_create_layergroup(self):
-        pass
+    def test_get_file_postgis(self):
+        ds = self._create_postgis_datastore()
+        try:
+            ds.get_file()
+            assert False
+        except TypeError:
+            ds.delete()
 
-    def test_create_layergroup_invalid(self):
-        pass
+    def test_get_file_shp(self):
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertEqual('file:data/nyc', ds.get_file())
+
+    def test_get_file_geotiff(self):
+        ds = self.gs.get_datastore('sfdem', 'sf')
+        self.assertEqual('file:data/sf/sfdem.tif', ds.get_file())
+
+    def test_get_type_postgis(self):
+        ds = self._create_postgis_datastore()
+        self.assertEqual(TYPE_POSTGIS, ds.get_type())
+        ds.delete()
+
+    def test_get_type_shp(self):
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertEqual(TYPE_SHP, ds.get_type())
+
+    def test_get_type_geotiff(self):
+        ds = self.gs.get_datastore('sfdem', 'sf')
+        self.assertEqual(TYPE_GEOTIFF, ds.get_type())
+
+    def test_get_database_params_shp(self):
+        try:
+            self.gs.get_datastore('nyc', 'tiger').get_database_params()
+            assert False
+        except TypeError:
+            pass
+
+    def test_get_database_params_geotiff(self):
+        try:
+            self.gs.get_datastore('sfdem', 'sf').get_database_params()
+            assert False
+        except TypeError:
+            pass
 
 
 if __name__ == '__main__':

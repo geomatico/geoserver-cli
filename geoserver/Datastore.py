@@ -137,11 +137,11 @@ class Datastore(Resource):
         :param opts: A dictionary containing some of these keys `host`, `port`, `database`, `schema`, `user`, `password`. Other keys are ignored.
         :type opts: Dictionary
         :rtype: None
-        :raise: :class:`ValueError` if the datastore type is not PostGIS.
+        :raise: :class:`TypeError` if the datastore type is not PostGIS.
         :raise: :class:`IOError` if any error occurs while requesting the REST API.
         """
         if self.datastore_type != TYPE_POSTGIS:
-            raise ValueError(
+            raise TypeError(
                 'Cannot set database params for type: ' + self.datastore_type)
         valid_keys = ('host', 'port', 'database', 'schema', 'user', 'password')
         valid_params = {k: params[k] for k in valid_keys if k in params}
@@ -164,13 +164,41 @@ class Datastore(Resource):
         pass
 
     def get_type(self):
+        """
+        Get the type of this datastore. Use TYPE_* constants.
+
+        :return: The type of this datastore.
+        :rtype: string
+        """
         return self.datastore_type
 
     def get_file(self):
-        return self.file
+        """
+        Get the file for this datastore.
+
+        :return: The URL of the file for this datastore (only if it is not a PostGIS datastore).
+        :rtype: string
+        :raise: :class:`TypeError` if the datastore type is PostGIS.
+        """
+        if self.datastore_type != TYPE_POSTGIS:
+            return self.file
+        else:
+            raise TypeError(
+                'Cannot get file for type: ' + self.datastore_type)
 
     def get_database_params(self):
-        return self.db_params
+        """
+        Get the database parameters for this datastore.
+
+        :return: A dictionary containing the database parameters for this datastore (only if it is a PostGIS datastore).
+        :rtype: Dictionary
+        :raise: :class:`TypeError` if the datastore type is not PostGIS.
+        """
+        if self.datastore_type == TYPE_POSTGIS:
+            return self.db_params
+        else:
+            raise TypeError(
+                'Cannot get database params for type: ' + self.datastore_type)
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
