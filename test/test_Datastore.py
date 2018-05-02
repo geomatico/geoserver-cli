@@ -31,10 +31,18 @@ class LayerTestCase(unittest.TestCase):
         self.assertEqual(names, expected)
 
     def test_get_layer_existing(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        layer = ds.get_layer('tiger_roads')
+        self.assertEqual('tiger:tiger_roads', layer.get_name())
+        self.assertEqual('tiger_roads', layer.get_default_style().get_name())
 
     def test_get_layer_non_existing(self):
-        pass
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertTrue(ds.get_layer('invalid') is None)
+
+    def test_get_layer_from_another_datastore(self):
+        ds = self.gs.get_datastore('nyc', 'tiger')
+        self.assertTrue(ds.get_layer('topp:states') is None)
 
     def test_get_layergroups(self):
         pass

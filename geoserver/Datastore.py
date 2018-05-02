@@ -1,4 +1,4 @@
-# pylint: disable=W0212
+# pylint: disable=W0212,C0301
 """
 Datastore
 """
@@ -50,6 +50,12 @@ class Datastore(Resource):
         return self.workspace
 
     def delete(self):
+        """
+        Deletes the datastore from GeoServer.
+
+        :rtype: None
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
         path = 'workspaces/' + self.workspace.get_name() + '/'
         if self.datastore_type == TYPE_SHP or self.datastore_type == TYPE_POSTGIS:
             path = path + 'datastores/' + self.name
@@ -68,9 +74,18 @@ class Datastore(Resource):
         layers = self.geoserver.get_layers()
         return list(filter(lambda l: l.get_datastore() == self, layers))
 
-
     def get_layer(self, name):
-        pass
+        """
+        Get a specific layer from this datastore.
+
+        :param name: Name of the layer to get.
+        :type name: string
+        :return: The required layer or None if the layer does not exist in this datastore (even if it exists in GeoServer).
+        :rtype: :class:`geoserver.Layer`
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        layer = self.geoserver.get_layer(name)
+        return layer if layer is not None and layer.get_datastore() == self else None
 
     def get_layergroups(self):
         pass
