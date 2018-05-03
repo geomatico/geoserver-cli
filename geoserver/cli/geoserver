@@ -2,7 +2,9 @@
 # # -*- coding: utf-8 -*-
 
 import sys
+import os
 from geoserver.cli.parser import parser, actions
+from geoserver.GeoServer import GeoServer
 
 
 if __name__ == "__main__":
@@ -10,7 +12,11 @@ if __name__ == "__main__":
     if not args.cmd:
         parser.print_help()
     else:
+        url = os.environ['GEOSERVER_URL']
+        user = os.environ['GEOSERVER_USER']
+        password = os.environ['GEOSERVER_PASS']
+        geoserver = GeoServer(url, user, password)
         try:
-            actions[args.cmd].run(args)
+            actions[args.cmd].run(args, geoserver)
         except Exception as e:
             print(e, file=sys.stderr)

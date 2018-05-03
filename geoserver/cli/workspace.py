@@ -39,5 +39,36 @@ def configure_parser(parser):
     delete.add_argument('name', help='Name of the workspace')
 
 
-def run(args):
-    print(args)
+def run(args, geoserver):
+    if not args.workspace_cmd:
+        workspaces = geoserver.get_workspaces()
+        workspaces = map(lambda w: w.get_name(), workspaces)
+        print('\n'.join(workspaces))
+    elif args.workspace_cmd == GET:
+        ws = geoserver.get_workspace(args.name)
+        if ws:
+            datastores = ws.get_datastores()
+            datastores = map(lambda d: '  ' + d.get_name(), datastores)
+
+            print(ws.get_name() + ' (' + ws.get_namespace() + ')')
+            print('\nDatastores:')
+            print('\n'.join(datastores))
+        else:
+            print('The workspace does not exist.')
+    elif args.workspace_cmd == CREATE:
+        geoserver.create_workspace(args.name, args.namespace)
+        print('Workspace created successfully.')
+    elif args.workspace_cmd == UPDATE:
+        ws = geoserver.get_workspace(args.name)
+        if ws:
+            ws.set_namespace(args.namespace)
+            print('Workspace updated successfully.')
+        else:
+            print('The workspace does not exist.')
+    elif args.workspace_cmd == DELETE:
+        ws = geoserver.get_workspace(args.name)
+        if ws:
+            ws.delete()
+            print('Workspace deleted successfully.')
+        else:
+            print('The workspace does not exist.')

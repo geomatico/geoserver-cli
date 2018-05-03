@@ -13,7 +13,7 @@ DELETE = 'delete'
 def configure_parser(parser):
     parser.description = HELP
     subparsers = parser.add_subparsers(
-        title='Commands', dest='layer_cmd',
+        title='Commands', dest='layergroup_cmd',
         help='Get info from all layer groups')
 
     # Get
@@ -24,17 +24,9 @@ def configure_parser(parser):
     get.add_argument('name', help='Name of the layer group')
 
     # Create
-    create = subparsers.add_parser(CREATE, help='Creates a new layer',
-                                   description='Creates a new layer')
+    create = subparsers.add_parser(CREATE, help='Creates a new layer group',
+                                   description='Creates a new layer group')
     create.add_argument('name', help='Name of the layer group to create')
-    create.add_argument(
-        '-w', '--workspace',
-        help='Name of the workspace containing the layer group',
-        required=False)
-    create.add_argument(
-        '-d', '--datastore',
-        help='Name of the datastore containing the layer group',
-        required=True)
     create.add_argument('layers', nargs=argparse.REMAINDER,
                         help='Layers to add to the group')
 
@@ -55,5 +47,36 @@ def configure_parser(parser):
     delete.add_argument('name', help='Name of the layer group')
 
 
-def run(args):
-    print(args)
+def run(args, geoserver):
+    if not args.layergroup_cmd:
+        groups = geoserver.get_layergroups()
+        groups = map(lambda g: g.get_name(), groups)
+        print('\n'.join(groups))
+    elif args.layergroup_cmd == GET:
+        group = geoserver.get_layergroup(args.name)
+        if group:
+            layers = group.get_layers()
+            datastores = map(lambda l: '  ' + l.get_name(), layers)
+
+            print(group.get_name())
+            print('\nLayers:')
+            print('\n'.join(datastores))
+        else:
+            print('The layer group does not exist.')
+    elif args.layergroup_cmd == CREATE:
+        geoserver.create_layergroup(args.name, args.layers)
+        print('Layer group created successfully.')
+    elif args.layergroup_cmd == UPDATE:
+        group = geoserver.get_layergroup(args.name)
+        if group:
+            group.set_layers(args.layers)
+            print('Layer group updated successfully.')
+        else:
+            print('The layer group does not exist.')
+    elif args.layergroup_cmd == DELETE:
+        group = geoserver.get_layergroup(args.name)
+        if group:
+            group.delete()
+            print('Layer group deleted successfully.')
+        else:
+            print('The layer group does not exist.')

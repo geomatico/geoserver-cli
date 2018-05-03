@@ -43,5 +43,35 @@ def configure_parser(parser):
     delete.add_argument('name', help='Name of the style')
 
 
-def run(args):
-    print(args)
+def run(args, geoserver):
+    if not args.style_cmd:
+        styles = geoserver.get_styles()
+        styles = map(lambda s: s.get_name(), styles)
+        print('\n'.join(styles))
+    elif args.style_cmd == GET:
+        style = geoserver.get_style(args.name)
+        if style:
+            print(style.get_name())
+            print(len(style.get_name()) * '-')
+            print(style.get_sld())
+        else:
+            print('The style does not exist.')
+    elif args.style_cmd == CREATE:
+        with open(args.file) as f:
+            geoserver.create_style(args.name, f.read())
+            print('Style created successfully.')
+    elif args.style_cmd == UPDATE:
+        with open(args.file) as f:
+            style = geoserver.get_style(args.name)
+            if style:
+                style.set_sld(f.read())
+                print('Style updated successfully.')
+            else:
+                print('The style does not exist.')
+    elif args.style_cmd == DELETE:
+        style = geoserver.get_style(args.name)
+        if style:
+            style.delete()
+            print('Style deleted successfully.')
+        else:
+            print('The style does not exist.')

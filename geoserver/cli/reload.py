@@ -8,5 +8,6 @@ def configure_parser(parser):
     parser.description = HELP
 
 
-def run(args):
-    print(args)
+def run(_, geoserver):
+    geoserver.reload()
+    print('GeoServer reload success.')

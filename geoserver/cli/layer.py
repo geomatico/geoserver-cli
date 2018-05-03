@@ -26,13 +26,10 @@ def configure_parser(parser):
                                    description='Creates a new layer')
     create.add_argument('-w', '--workspace',
                         help='Name of the workspace containing the layer',
-                        required=False)
+                        required=True)
     create.add_argument('-d', '--datastore',
                         help='Name of the datastore containing the layer',
                         required=True)
-    create.add_argument('-s', '--style',
-                        help='Name of the default style to use for the layer',
-                        required=False)
     create.add_argument('name', help='Name of the layer to create')
 
     # Update
@@ -41,7 +38,7 @@ def configure_parser(parser):
     update.add_argument('name', help='Name of the layer')
     update.add_argument('-s', '--style',
                         help='Name of the default style to use for the layer',
-                        required=False)
+                        required=True)
 
     # Delete
     delete = subparsers.add_parser(DELETE, help='Deletes a layer',
@@ -49,5 +46,41 @@ def configure_parser(parser):
     delete.add_argument('name', help='Name of the layer')
 
 
-def run(args):
-    print(args)
+def run(args, geoserver):
+    if not args.layer_cmd:
+        layers = geoserver.get_layers()
+        layers = map(lambda l: l.get_name(), layers)
+        print('\n'.join(layers))
+    elif args.layer_cmd == GET:
+        layer = geoserver.get_layer(args.name)
+        if layer:
+            style = layer.get_default_style()
+            print(layer.get_name())
+            print('Default style: ' + style.get_name())
+        else:
+            print('The layer does not exist.')
+    elif args.layer_cmd == CREATE:
+        ws = geoserver.get_workspace(args.workspace)
+        if not ws:
+            print('Workspace does not exist.')
+            return
+        ds = ws.get_datastore(args.datastore)
+        if not ds:
+            print('Datastore does not exist.')
+            return
+        ds.create_layer(args.name)
+        print('Layer created successfully.')
+    elif args.layer_cmd == UPDATE:
+        layer = geoserver.get_layer(args.name)
+        if layer:
+            layer.set_default_style(args.style)
+            print('Layer updated successfully.')
+        else:
+            print('The layer does not exist.')
+    elif args.layer_cmd == DELETE:
+        layer = geoserver.get_layer(args.name)
+        if layer:
+            layer.delete()
+            print('Layer deleted successfully.')
+        else:
+            print('The layer does not exist.')
