@@ -108,7 +108,6 @@ class GeoServer:
     def _layer_from_json(self, layer):
         name = layer['name']
         layer_info = self._get('layers/' + name)['layer']
-        style = self.get_style(layer_info['defaultStyle']['name'])
 
         res = self._get(layer_info['resource']['href'])
         res_info = next(iter(res.values()))
@@ -116,7 +115,7 @@ class GeoServer:
         ds = ws.get_datastore(res_info['store']['name'])
 
         qualified_name = name if ':' in name else ws.get_name() + ':' + name
-        return Layer(qualified_name, self, style, ds, ws)
+        return Layer(qualified_name, self, ds, ws)
 
     def get_layers(self):
         """

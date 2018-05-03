@@ -1,40 +1,48 @@
+# pylint: disable=too-many-public-methods,missing-docstring
+
 import unittest
-from geoserver.Style import Style
+from test.AbstractGeoServerTestCase import AbstractGeoServerTestCase
 
 
-class LayerTestCase(unittest.TestCase):
-    def test_get_geoserver(self):
-        pass
-
-    def test_delete(self):
-        pass
-
+class LayerTestCase(AbstractGeoServerTestCase):
     def test_get_workspace(self):
-        pass
+        layer = self.gs.get_layer('topp:states')
+        self.assertEqual(self.gs.get_workspace('topp'), layer.get_workspace())
 
     def test_get_datastore(self):
-        pass
+        layer = self.gs.get_layer('topp:states')
+        ws = self.gs.get_workspace('topp')
+        ds = ws.get_datastore('states_shapefile')
+        self.assertEqual(ds, layer.get_datastore())
 
-    def test_get_style(self):
-        pass
+    def test_get_default_style(self):
+        layer = self.gs.get_layer('topp:states')
+        style = layer.get_default_style()
+        self.assertEqual(style, self.gs.get_style('polygon'))
 
-    def test_set_style_by_name(self):
-        pass
+    def test_set_default_style_by_name(self):
+        layer = self.gs.get_layer('topp:states')
+        self.assertEqual(layer.get_default_style(), self.gs.get_style('polygon'))
+        layer.set_default_style('burg')
+        self.assertEqual(layer.get_default_style(), self.gs.get_style('burg'))
+        layer.set_default_style('polygon')
+        self.assertEqual(layer.get_default_style(), self.gs.get_style('polygon'))
 
-    def test_set_style_by_instance(self):
-        pass
+    def test_set_default_style_by_instance(self):
+        layer = self.gs.get_layer('topp:states')
+        self.assertEqual(layer.get_default_style(), self.gs.get_style('polygon'))
+        layer.set_default_style(self.gs.get_style('burg'))
+        self.assertEqual(layer.get_default_style(), self.gs.get_style('burg'))
+        layer.set_default_style(self.gs.get_style('polygon'))
+        self.assertEqual(layer.get_default_style(), self.gs.get_style('polygon'))
 
-    def test_set_style_invalid(self):
-        pass
-
-    def test_get_description(self):
-        pass
-
-    def test_set_description(self):
-        pass
-
-    def test_set_description(self):
-        pass
+    def test_set_default_style_invalid(self):
+        layer = self.gs.get_layer('topp:states')
+        try:
+            layer.set_default_style('invalid')
+            assert False
+        except ValueError:
+            pass
 
 
 if __name__ == '__main__':

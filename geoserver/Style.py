@@ -51,3 +51,8 @@ class Style(Resource):
         return self.geoserver._request(
             'resource/styles/' + style['style']['filename'],
             extension='')
+
+    def __eq__(self, other):
+        return (self.__class__ == other.__class__ and
+                self.geoserver == other.geoserver and
+                self.name == other.name)
