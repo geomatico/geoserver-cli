@@ -31,7 +31,7 @@ doc:
 
 .PHONY: docker-run
 docker-run: prepare-test-data
-	docker run -d -p 8080:8080 -v ${PWD}/test/data:/var/local/geoserver --name=geoserver-cli-test oscarfonts/geoserver:${GEOSERVER_VERSION}
+	docker run -d -p 8080:8080 -v ${PWD}/test/data:/var/local/geoserver --name=geoserver-cli-test-${GEOSERVER_VERSION} oscarfonts/geoserver:${GEOSERVER_VERSION}
 
 .PHONY: docker-run-maintenance
 docker-run-maintenance: GEOSERVER_VERSION = 2.12.2
