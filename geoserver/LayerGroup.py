@@ -16,6 +16,7 @@ class LayerGroup(Resource):
     :type name: string
     :type geoserver: :class:`geoserver.GeoServer`
     """
+
     def __init__(self, name, geoserver):
         Resource.__init__(self, name, geoserver)
 
@@ -41,19 +42,33 @@ class LayerGroup(Resource):
         layergroup_info = self.geoserver._get('layergroups/' + self.name)
         published = layergroup_info['layerGroup']['publishables']['published']
         styles = layergroup_info['layerGroup']['styles']['style']
+
+        def _unqualified(name):
+            return name if ':' not in name else name.split(':')[1]
+
+        # Add
+        published_names = list(map(lambda p: p['name'], published))
+        to_remove = []
+        for layer in layers:
+            if (layer not in published_names
+                    and _unqualified(layer) not in published_names):
+                published.append({
+                    '@type': 'layer',
+                    'name': layer
+                })
+                styles.append('null')
+            else:
+                to_remove.append(layer)
+
         # Remove
+        unqualified_to_remove = list(map(_unqualified, to_remove))
         for i, layer in enumerate(published):
-            if layer['name'] in layers:
+            name = layer['name']
+            if ((':' in name and name in to_remove)
+                    or (':' not in name and _unqualified(name) in unqualified_to_remove)):
                 del published[i]
                 del styles[i]
-                layers.remove(layer['name'])
-        # Add
-        for layer in layers:
-            published.append({
-                '@type': 'layer',
-                'name': layer
-            })
-            styles.append('null')
+
         self.geoserver._request(
             'layergroups/' + self.name, method='PUT',
             headers={'Content-type': 'application/json'},
@@ -67,7 +82,9 @@ class LayerGroup(Resource):
         :rtype: list of :class:`geoserver.Layer`
         :raise: :class:`IOError` if any error occurs while requesting the REST API.
         """
-        layergroup_info = self.geoserver._get('layergroups/' + self.name)['layerGroup']
+        layergroup_info = self.geoserver._get(
+            'layergroups/' + self.name)['layerGroup']
         published = layergroup_info['publishables']['published']
-        layers_json = map(lambda l: self.geoserver._get(l['href'])['layer'], published)
+        layers_json = map(lambda l: self.geoserver._get(
+            l['href'])['layer'], published)
         return list(map(self.geoserver._layer_from_json, layers_json))
