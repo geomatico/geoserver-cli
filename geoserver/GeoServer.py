@@ -147,14 +147,6 @@ class GeoServer:
             logging.info(e)
             return None
 
-    def _layergroup_from_json(self, layergroup):
-        name = layergroup['name']
-        layergroup_info = self._get('layergroups/' + name)['layerGroup']
-        published = layergroup_info['publishables']['published']
-        layers_json = map(lambda l: self._get(l['href'])['layer'], published)
-        layers = list(map(self._layer_from_json, layers_json))
-        return LayerGroup(name, self, layers)
-
     def get_layergroups(self):
         """
         Get all the layer groups in the GeoServer instance.
@@ -164,7 +156,7 @@ class GeoServer:
         :raise: :class:`IOError` if any error occurs while requesting the REST API.
         """
         layergroups = self._get('layergroups')['layerGroups']['layerGroup']
-        return list(map(self._layergroup_from_json, layergroups))
+        return list(map(lambda l: LayerGroup(l['name'], self), layergroups))
 
     def get_layergroup(self, name):
         """
@@ -179,8 +171,8 @@ class GeoServer:
         if not name:
             return None
         try:
-            layer = self._get('layergroups/' + name)['layerGroup']
-            return self._layergroup_from_json(layer)
+            layergroup = self._get('layergroups/' + name)['layerGroup']
+            return LayerGroup(layergroup['name'], self)
         except IOError as e:
             logging.info(e)
             return None
