@@ -26,7 +26,7 @@ class LayerGroup(Resource):
         :rtype: None
         :raise: :class:`IOError` if any error occurs while requesting the REST API.
         """
-        self.geoserver._request('layers/' + self.name, method='DELETE')
+        self.geoserver._request('layergroups/' + self.name, method='DELETE')
         self.geoserver.reload()
 
     def set_layers(self, layers):

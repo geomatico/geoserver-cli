@@ -268,6 +268,35 @@ class GeoServer:
             'namespaces/' + name, method='PUT',
             headers={'Content-type': 'application/json'}, data=ns)
 
+    def create_layergroup(self, name, layers):
+        """
+        Creates a new layer group.
+
+        :param name: Name of the layer group to create.
+        :param layers: List of layers composing the group.
+        :type name: string
+        :type layers: list of string
+        :rtype: None
+        :raise: :class:`IOError` if any error occurs while requesting the REST API.
+        """
+        data = {
+            'layerGroup': {
+                'name': name,
+                'publishables': {
+                    'published': list(map(lambda layer: {
+                        '@type': 'layer',
+                        'name': layer
+                    }, layers))
+                },
+                'styles': {
+                    'style': ['null'] * len(layers)
+                }
+            }
+        }
+        self._request(
+            'layergroups', method='POST', expected_code=201,
+            headers={'Content-type': 'application/json'}, data=json.dumps(data))
+
     def create_style(self, name, sld):
         """
         Creates a new style.

@@ -176,6 +176,22 @@ class GeoServerTestCase(AbstractGeoServerTestCase):
         except IOError:
             pass
 
+    def test_create_layergroup(self):
+        names = ['sf:sfdem', 'topp:states']
+        self.gs.create_layergroup('new_layergroup', names)
+        group = self.gs.get_layergroup('new_layergroup')
+        names = set(map(lambda l: l.get_name(), group.get_layers()))
+        self.assertEqual(names, set(names))
+
+        group.delete()
+
+    def test_create_layergroup_invalid_layers(self):
+        try:
+            self.gs.create_layergroup('new_layergroup', ['invalid_layer'])
+            assert False
+        except IOError:
+            pass
+
     def test_reset(self):
         # Just make sure it doesn't break
         self.gs.reset()
