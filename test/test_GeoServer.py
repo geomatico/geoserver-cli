@@ -141,7 +141,7 @@ class GeoServerTestCase(AbstractGeoServerTestCase):
             pass
 
     def test_create_style(self):
-        with open('test/sample.sld') as f:
+        with open('test/burg.sld') as f:
             sld = f.read()
         self.gs.create_style('new_style', sld)
         style = self.gs.get_style('new_style')
@@ -150,7 +150,7 @@ class GeoServerTestCase(AbstractGeoServerTestCase):
         style.delete()
 
     def test_create_style_invalid_name(self):
-        with open('test/sample.sld') as f:
+        with open('test/burg.sld') as f:
             sld = f.read()
         try:
             self.gs.create_style('', sld)
@@ -159,7 +159,7 @@ class GeoServerTestCase(AbstractGeoServerTestCase):
             pass
 
     def test_create_style_None_name(self):
-        with open('test/sample.sld') as f:
+        with open('test/burg.sld') as f:
             sld = f.read()
         try:
             self.gs.create_style(None, sld)
