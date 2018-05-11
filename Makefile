@@ -18,9 +18,12 @@ coverage-html: test
 
 .PHONY: doc
 doc:
+	@echo ================== DOC ========================
 	@sphinx-apidoc -feo docs/source geoserver geoserver/cli
 	@cd docs && make clean html
 
 .PHONY: docker-run
 docker-run:
+	@echo ========================= DOCKER RUN =========================
+	@echo Starting Docker...
 	docker run -d -p 8080:8080 -v ${PWD}/test/geoserver_data_dir:/var/local/geoserver --name=geoserver-cli-test oscarfonts/geoserver:latest

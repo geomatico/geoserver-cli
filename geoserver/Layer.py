@@ -2,27 +2,15 @@ from geoserver.Resource import Resource
 
 
 class Layer(Resource):
-    def __init__(self, name, geoserver, description, datastore, workspace):
+    def __init__(self, name, geoserver, default_style, datastore, workspace):
         Resource.__init__(self, name, geoserver)
-        pass
-
-    def get_workspace(self):
-        pass
-
-    def get_datastore(self):
-        pass
+        self.default_style = default_style
 
     def delete(self):
         pass
 
-    def set_style(self, style):
-        pass
+    def set_default_style(self, style):
+        self.default_style = style
 
-    def get_style(self):
-        pass
-
-    def set_description(self, description):
-        pass
-
-    def get_description(self):
-        pass
+    def get_default_style(self):
+        return self.default_style
