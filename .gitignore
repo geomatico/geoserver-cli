@@ -12,5 +12,6 @@ docs/source/modules.rst
 docs/build
 build
 *.egg-info
+test/geoserver_data_dir/styles/new_style.sld.bak*
 
 /dist/
